@@ -1,0 +1,4 @@
+[run]
+branch = True
+source = uw_gws
+include = uw_gws/*
