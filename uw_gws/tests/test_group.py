@@ -129,6 +129,9 @@ class GWSGroupTest(TestCase):
         groups = gws.search_groups(member="javerage")
         self.assertEquals(len(groups), 15)
 
+        groups = gws.search_groups(member="JAVERAGE")
+        self.assertEquals(len(groups), 15)
+
     def test_group_roles(self):
         group = GWS().get_group_by_id('u_eventcal_sea_1013649-editor')
 

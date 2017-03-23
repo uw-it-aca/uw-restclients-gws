@@ -50,7 +50,7 @@ class GWS(object):
                 Values are 'one' to limit results to one level of stem name
                 and 'all' to return all groups.
         """
-        kwargs = dict((k.lower(), v.lower()) for k, v in kwargs.iteritems())
+        kwargs = dict((k.lower(), kwargs[k].lower()) for k in kwargs)
         if 'type' in kwargs and (
                 kwargs['type'] != 'direct' and kwargs['type'] != 'effective'):
             del(kwargs['type'])
