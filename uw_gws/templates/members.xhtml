@@ -1,0 +1,14 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11/dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
+    </head>
+    <body>
+        <ul class="members">{% for member in members %}
+            <li>
+                <a rel="memberlink" class="member" type="{{member.member_type}}" href="/group_sws/v2/group/{{group_id}}/member/{{member.name}}">{{member.name}}</a>
+            </li>{% endfor %}
+        </ul>
+    </body>
+</html>

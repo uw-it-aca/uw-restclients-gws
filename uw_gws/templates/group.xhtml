@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8"/>
+    </head>
+    <body>
+        <div class="group">
+            <span class="regid">{{group.uwregid}}</span>
+            <span class="title">{{group.title}}</span>
+            <span class="description">{{group.description if group.description is not none else ''}}</span>
+
+            <ul class="names">
+                <li class="name">{{group.name}}</li>
+            </ul>
+
+            <span class="authnfactor">{{group.authnfactor}}</span>
+            <span class="classification">{{group.classification}}</span>
+            <span class="dependson">{{group.dependson if group.dependson is not none else ''}}</span>
+            <span class="emailenabled">{{group.emailenabled}}</span>
+            <span class="publishemail">{{group.publishemail if group.publishemail is not none else ''}}</span>
+            <span class="contact">{{group.contact if group.contact is not none else ''}}</span>
+            <span class="reporttoorig">{{group.reporttoorig}}</span>
+
+            <ul class="authorigs">{% for authorig in group.authorigs %}
+                <li class="authorig">{{authorig.name}}</li>{% endfor %}
+            </ul>
+
+            <ul class="admins">{% for admin in group.admins %}
+                <li class="admin" type="{{admin.user_type}}">{{admin.name}}</li>{% endfor %}
+            </ul>
+
+            <ul class="updaters">{% for updater in group.updaters %}
+                <li class="updater" type="{{updater.user_type}}">{{updater.name}}</li>{% endfor %}
+            </ul>
+
+            <ul class="creators">{% for creator in group.creators %}
+                <li class="creator" type="{{creator.user_type}}">{{creator.name}}</li>{% endfor %}
+            </ul>
+
+            <ul class="readers">{% for reader in group.readers %}
+                <li class="reader" type="{{reader.user_type}}">{{reader.name}}</li>{% endfor %}
+            </ul>
+
+            <ul class="viewers">{% for viewer in group.viewers %}
+                <li class="viewer" type="{{viewer.user_type}}">{{viewer.name}}</li>{% endfor %}
+            </ul>
+
+            <ul class="optins">{% for optin in group.optins %}
+                <li class="optin" type="{{optin.user_type}}">{{optin.name}}</li>{% endfor %}
+            </ul>
+
+            <ul class="optouts">{% for optout in group.optouts %}
+                <li class="optout" type="{{optout.user_type}}">{{optout.name}}</li>{% endfor %}
+            </ul>
+        </div>
+    </body>
+</html>

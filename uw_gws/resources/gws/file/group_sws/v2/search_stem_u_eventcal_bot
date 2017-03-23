@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+</head>
+<body>
+
+<div>
+Search results
+<p/>
+ <ul class="groupreferences">
+   <li class="groupreference">
+      <span class="regid">45cb833f55c64214b67f15a8efc535ce</span>
+      <span class="title">u_eventcal_bot parent group</span>
+      <span class="description"></span>
+      <ul>
+      <li><a class="name" href="/group_sws/v2/group/45cb833f55c64214b67f15a8efc535ce">u_eventcal_bot</a></li>
+      </ul>
+    </li>
+
+   <li class="groupreference">
+      <span class="regid">a5bdb04b83954f089d1088bdf591f935</span>
+      <span class="title">UW Bothell Campus Events calendar showon group</span>
+      <span class="description"></span>
+      <ul>
+      <li><a class="name" href="/group_sws/v2/group/a5bdb04b83954f089d1088bdf591f935">u_eventcal_bot_1012234-showon</a></li>
+      </ul>
+    </li>
+
+   <li class="groupreference">
+      <span class="regid">d530545a8809459cb3ea9b9e92adfc23</span>
+      <span class="title">UW Bothell Campus Events calendar editor group</span>
+      <span class="description"></span>
+      <ul>
+      <li><a class="name" href="/group_sws/v2/group/d530545a8809459cb3ea9b9e92adfc23">u_eventcal_bot_1012234-editor</a></li>
+      </ul>
+    </li>
+
+ </ul>
+</div>
+
+<div class="status">${status}</div>
+
+
+</body>
+</html>
