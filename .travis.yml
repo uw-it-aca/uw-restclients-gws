@@ -16,7 +16,7 @@ script:
 - pep8 --exclude=uw_gws/tests uw_gws
 - coverage run uw_gws/test.py -v
 after_script:
-- coveralls
+- coveralls -v
 before_deploy:
 - find uw_gws/ -name \*.pyc -exec rm {} \;
 - echo $TRAVIS_TAG > uw_gws/VERSION
