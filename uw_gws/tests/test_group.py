@@ -159,6 +159,17 @@ class GWSGroupTest(TestCase):
         self.assertEquals(group.readers[0].user_type, GroupUser.NONE_TYPE)
         self.assertEquals(group.readers[0].name, "dc=all")
 
+        self.assertIsNotNone(group.creators)
+        self.assertEquals(len(group.creators), 1)
+        self.assertEquals(group.creators[0].user_type, GroupUser.UWNETID_TYPE)
+        self.assertEquals(group.creators[0].name, "jcreator")
+
+        self.assertIsNotNone(group.optins)
+        self.assertEquals(len(group.optins), 1)
+        self.assertEquals(group.optins[0].user_type, GroupUser.UWNETID_TYPE)
+        self.assertEquals(group.optins[0].name, "joptin")
+
+
         self.assertIsNotNone(group.optouts)
         self.assertEquals(len(group.optouts), 1)
         self.assertEquals(group.optouts[0].user_type, GroupUser.NONE_TYPE)

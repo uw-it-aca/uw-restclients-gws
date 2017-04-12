@@ -325,9 +325,7 @@ class GWS(object):
 
         # viewers are not used according to Jim Fox
         group.viewers = []
-        for user in root.findall('.//*[@class="viewers"]/*[@class="viewer"]'):
-            group.viewers.append(GroupUser(name=user.text,
-                                           user_type=user.get("type")))
+
         return group
 
     def _effective_members_from_xhtml(self, data):
