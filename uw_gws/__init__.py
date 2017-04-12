@@ -69,18 +69,22 @@ class GWS(object):
         if response.status != 200:
             raise DataFailureException(url, response.status, response.data)
 
-        root = etree.fromstring(response.data)
-        group_elements = root.findall(
-            './/*[@class="groupreferences"]//*[@class="groupreference"]')
+        matches = re.findall('<li class="groupreference">.*?</li>',
+                             response.data, re.DOTALL)
 
         groups = []
-        for element in group_elements:
+        for element in matches:
             group = GroupReference()
-            group.uwregid = element.find('.//*[@class="regid"]').text
-            group.title = element.find('.//*[@class="title"]').text
-            group.description = element.find('.//*[@class="description"]').text
-            group.name = element.find('.//*[@class="name"]').text
-            group.url = element.find('.//*[@class="name"]').get('href')
+            group.uwregid = re.match('.*"regid">(.*?)</span>',
+                                     element, re.DOTALL).groups(1)
+            group.title = re.match('.*"title">(.*?)</span>',
+                                   element, re.DOTALL).groups(1)
+            group.description = re.match('.*"description">(.*?)</span>',
+                                         element, re.DOTALL).groups(1)
+            group.name = re.match('.*"name".*?>(.*?)</a>',
+                                  element, re.DOTALL).groups(1)
+            group.url = re.match('.*href=".*?"', element, re.DOTALL).groups(1)
+
             groups.append(group)
 
         return groups
@@ -221,9 +225,7 @@ class GWS(object):
         if response.status != 200:
             raise DataFailureException(url, response.status, response.data)
 
-        root = etree.fromstring(response.data)
-        count = root.find('.//*[@class="member_count"]').get("count")
-
+        count = re.match('.*count="(.*?)"', response.data, re.DOTALL).group(1)
         return int(count)
 
     def is_effective_member(self, group_id, netid):
@@ -329,26 +331,23 @@ class GWS(object):
         return group
 
     def _effective_members_from_xhtml(self, data):
-        root = etree.fromstring(data)
-        member_elements = root.findall(
-            './/*[@class="members"]//*[@class="effective_member"]')
-
+        matches = re.findall('class="effective_member".*?</a>', data,
+                             re.DOTALL)
         members = []
-        for member in member_elements:
-            members.append(GroupMember(name=member.text,
-                                       member_type=member.get("type")))
+        for member in matches:
+            values = re.match('.*type="(.*?)".*?>(.*?)</a>', member)
+            members.append(GroupMember(name=values.group(2),
+                                       member_type=values.group(1)))
 
         return members
 
     def _members_from_xhtml(self, data):
-        root = etree.fromstring(data)
-        member_elements = root.findall(
-            './/*[@class="members"]//*[@class="member"]')
-
+        matches = re.findall('class="member".*?</a>', data, re.DOTALL)
         members = []
-        for member in member_elements:
-            members.append(GroupMember(name=member.text,
-                                       member_type=member.get("type")))
+        for member in matches:
+            values = re.match('.*type="(.*?)".*?>(.*?)</a>', member)
+            members.append(GroupMember(name=values.group(2),
+                                       member_type=values.group(1)))
 
         return members
 
