@@ -85,6 +85,15 @@ class GWSGroupTest(TestCase):
 
         self.assertEquals(len(new_members), 4)
 
+    def test_update_roundtrip(self):
+        gws = GWS()
+        group_id = "u_acadev_bad_members"
+        members = []
+        members.append(GroupMember(member_type="uwnetid", name="_"))
+        bad_members = gws.update_members(group_id, members)
+
+        self.assertEquals(len(bad_members), 1)
+
     def test_effective_group_membership(self):
         gws = GWS()
         members = gws.get_effective_members('u_acadev_unittest')
