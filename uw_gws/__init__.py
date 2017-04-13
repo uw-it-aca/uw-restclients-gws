@@ -344,7 +344,8 @@ class GWS(object):
         return members
 
     def _notfoundmembers_from_xhtml(self, data):
-        matches = re.findall('class="notfoundmember".*?</span>', data, re.DOTALL)
+        matches = re.findall('class="notfoundmember".*?</span>', data,
+                             re.DOTALL)
         members = []
         for member in matches:
             name = re.match('.*>(.*?)<', member).group(1)
