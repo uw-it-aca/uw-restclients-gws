@@ -12,7 +12,6 @@ try:
     from urllib.parse import urlencode
 except ImportError:
     from urllib import urlencode
-from lxml import etree
 from datetime import datetime
 import re
 import os
@@ -345,13 +344,11 @@ class GWS(object):
         return members
 
     def _notfoundmembers_from_xhtml(self, data):
-        root = etree.fromstring(data)
-        member_elements = root.findall(
-            './/*[@class="notfoundmembers"]//*[@class="notfoundmember"]')
-
+        matches = re.findall('class="notfoundmember".*?</span>', data, re.DOTALL)
         members = []
-        for member in member_elements:
-            members.append(member.text)
+        for member in matches:
+            name = re.match('.*>(.*?)<', member).group(1)
+            members.append(name)
 
         return members
 

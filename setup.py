@@ -23,7 +23,6 @@ setup(
     author_email="aca-it@uw.edu",
     include_package_data=True,
     install_requires=['UW-RestClients-Core>0.8,<1.0',
-                      'lxml==3.7.1',
                       'Jinja2',
                       'mock',
                      ],
