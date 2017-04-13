@@ -251,7 +251,8 @@ class GWS(object):
 
     def _group_from_xhtml(self, data):
         def _get_field(class_name):
-            value = re.match('.*class="%s".*?>(.*?)<' % class_name, data, re.DOTALL).group(1)
+            value = re.match('.*class="%s".*?>(.*?)<' % class_name,
+                             data, re.DOTALL).group(1)
             return value
 
         def _add_type(field, name):
@@ -277,7 +278,8 @@ class GWS(object):
 
             group.instructors = []
 
-            instructors = re.findall('class="course_instructor".*?</li>', data, re.DOTALL)
+            instructors = re.findall('class="course_instructor".*?</li>',
+                                     data, re.DOTALL)
             for user in instructors:
                 values = re.match('.*>(.*?)</li>', user)
                 group.instructors.append(GroupMember(name=values.group(1),
