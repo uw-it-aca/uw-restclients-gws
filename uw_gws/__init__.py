@@ -12,7 +12,6 @@ try:
     from urllib.parse import urlencode
 except ImportError:
     from urllib import urlencode
-from lxml import etree
 from datetime import datetime
 import re
 import os
@@ -69,18 +68,22 @@ class GWS(object):
         if response.status != 200:
             raise DataFailureException(url, response.status, response.data)
 
-        root = etree.fromstring(response.data)
-        group_elements = root.findall(
-            './/*[@class="groupreferences"]//*[@class="groupreference"]')
+        matches = re.findall('<li class="groupreference">.*?</li>',
+                             response.data, re.DOTALL)
 
         groups = []
-        for element in group_elements:
+        for element in matches:
             group = GroupReference()
-            group.uwregid = element.find('.//*[@class="regid"]').text
-            group.title = element.find('.//*[@class="title"]').text
-            group.description = element.find('.//*[@class="description"]').text
-            group.name = element.find('.//*[@class="name"]').text
-            group.url = element.find('.//*[@class="name"]').get('href')
+            group.uwregid = re.match('.*"regid">(.*?)</span>',
+                                     element, re.DOTALL).groups(1)
+            group.title = re.match('.*"title">(.*?)</span>',
+                                   element, re.DOTALL).groups(1)
+            group.description = re.match('.*"description">(.*?)</span>',
+                                         element, re.DOTALL).groups(1)
+            group.name = re.match('.*"name".*?>(.*?)</a>',
+                                  element, re.DOTALL).groups(1)
+            group.url = re.match('.*href=".*?"', element, re.DOTALL).groups(1)
+
             groups.append(group)
 
         return groups
@@ -221,9 +224,7 @@ class GWS(object):
         if response.status != 200:
             raise DataFailureException(url, response.status, response.data)
 
-        root = etree.fromstring(response.data)
-        count = root.find('.//*[@class="member_count"]').get("count")
-
+        count = re.match('.*count="(.*?)"', response.data, re.DOTALL).group(1)
         return int(count)
 
     def is_effective_member(self, group_id, netid):
@@ -248,118 +249,107 @@ class GWS(object):
             raise DataFailureException(url, response.status, response.data)
 
     def _group_from_xhtml(self, data):
-        root = etree.fromstring(data)
-        group_id = root.find('.//*[@class="name"]').text
+        def _get_field(class_name):
+            value = re.match('.*class="%s".*?>(.*?)<' % class_name,
+                             data, re.DOTALL).group(1)
+            return value
+
+        def _add_type(field, name):
+            users = re.findall('class="%s".*?</li>' % name, data, re.DOTALL)
+            for user in users:
+                values = re.match('.*type="(.*?)".*?>(.*?)</li>', user)
+                field.append(GroupMember(name=values.group(2),
+                                         member_type=values.group(1),
+                                         # This is an error that's being
+                                         # tested for :(  the model type is
+                                         # member_type
+                                         user_type=values.group(1)))
+
+        group_id = _get_field('name')
         if re.match(r'^course_', group_id):
             group = CourseGroup()
-            group.curriculum_abbr = root.find(
-                './/*[@class="course_curr"]').text.upper()
-            group.course_number = root.find('.//*[@class="course_no"]').text
-            group.year = root.find('.//*[@class="course_year"]').text
-            group.quarter = self.QTRS[
-                root.find('.//*[@class="course_qtr"]').text]
-            group.section_id = root.find(
-                './/*[@class="course_sect"]').text.upper()
-            group.sln = root.find('.//*[@class="course_sln"]').text
+            group.curriculum_abbr = _get_field('course_curr').upper()
+            group.course_number = _get_field('course_no')
+            group.year = _get_field('course_year')
+            group.quarter = self.QTRS[_get_field('course_qtr')]
+            group.section_id = _get_field('course_sect').upper()
+            group.sln = _get_field('course_sln')
 
             group.instructors = []
-            instructors = root.findall('.//*[@class="course_instructors"]' +
-                                       '/*[@class="course_instructor"]')
-            for instructor in instructors:
-                group.instructors.append(GroupMember(name=instructor.text,
-                                                     member_type="uwnetid"))
+
+            instructors = re.findall('class="course_instructor".*?</li>',
+                                     data, re.DOTALL)
+            for user in instructors:
+                values = re.match('.*>(.*?)</li>', user)
+                group.instructors.append(GroupMember(name=values.group(1),
+                                         member_type="uwnetid"))
         else:
             group = Group()
 
         group.name = group_id
-        group.uwregid = root.find('.//*[@class="regid"]').text
-        group.title = root.find('.//*[@class="title"]').text
-        group.description = root.find('.//*[@class="description"]').text
-        group.contact = root.find('.//*[@class="contact"]').text
-        group.authnfactor = root.find('.//*[@class="authnfactor"]').text
-        group.classification = root.find('.//*[@class="classification"]').text
-        group.emailenabled = root.find('.//*[@class="emailenabled"]').text
-        group.dependson = root.find('.//*[@class="dependson"]').text
-        group.publishemail = root.find('.//*[@class="publishemail"]').text
+        group.uwregid = _get_field('regid')
+        group.title = _get_field('title')
+        group.description = _get_field('description')
+        group.contact = _get_field('contact')
+        group.authnfactor = _get_field('authnfactor')
+        group.classification = _get_field('classification')
+        group.emailenabled = _get_field('emailenabled')
+        group.dependson = _get_field('dependson')
+        group.publishemail = _get_field('publishemail')
 
         try:
-            member_modified = root.find('.//*[@class="membermodifytime"]').text
+            member_modified = _get_field('membermodifytime')
             group.membership_modified = datetime.fromtimestamp(
                 float(member_modified)/1000)
         except AttributeError:
             group.membership_modified = None
 
         try:
-            group.reporttoorig = root.find('.//*[@class="reporttoorig"]').text
+            group.reporttoorig = _get_field('reporttoorig')
         except AttributeError:
             # Legacy class name for this attribute
-            group.reporttoorig = root.find('.//*[@class="reporttoowner"]').text
+            group.reporttoorig = _get_field('reporttoowner')
 
-        for user in root.findall('.//*[@class="admins"]/*[@class="admin"]'):
-            group.admins.append(GroupUser(name=user.text,
-                                          user_type=user.get("type")))
-
-        for user in (
-                root.findall('.//*[@class="updaters"]/*[@class="updater"]')):
-            group.updaters.append(GroupUser(name=user.text,
-                                            user_type=user.get("type")))
-
-        for user in (
-                root.findall('.//*[@class="creators"]/*[@class="creator"]')):
-            group.creators.append(GroupUser(name=user.text,
-                                            user_type=user.get("type")))
-
-        for user in root.findall('.//*[@class="readers"]/*[@class="reader"]'):
-            group.readers.append(GroupUser(name=user.text,
-                                           user_type=user.get("type")))
-
-        for user in root.findall('.//*[@class="optins"]/*[@class="optin"]'):
-            group.optins.append(GroupUser(name=user.text,
-                                          user_type=user.get("type")))
-
-        for user in root.findall('.//*[@class="optouts"]/*[@class="optout"]'):
-            group.optouts.append(GroupUser(name=user.text,
-                                           user_type=user.get("type")))
+        _add_type(group.admins, "admin")
+        _add_type(group.updaters, "updater")
+        _add_type(group.creators, "creator")
+        _add_type(group.readers, "reader")
+        _add_type(group.optins, "optin")
+        _add_type(group.optouts, "optout")
 
         # viewers are not used according to Jim Fox
         group.viewers = []
-        for user in root.findall('.//*[@class="viewers"]/*[@class="viewer"]'):
-            group.viewers.append(GroupUser(name=user.text,
-                                           user_type=user.get("type")))
+
         return group
 
     def _effective_members_from_xhtml(self, data):
-        root = etree.fromstring(data)
-        member_elements = root.findall(
-            './/*[@class="members"]//*[@class="effective_member"]')
-
+        matches = re.findall('class="effective_member".*?</a>', data,
+                             re.DOTALL)
         members = []
-        for member in member_elements:
-            members.append(GroupMember(name=member.text,
-                                       member_type=member.get("type")))
+        for member in matches:
+            values = re.match('.*type="(.*?)".*?>(.*?)</a>', member)
+            members.append(GroupMember(name=values.group(2),
+                                       member_type=values.group(1)))
 
         return members
 
     def _members_from_xhtml(self, data):
-        root = etree.fromstring(data)
-        member_elements = root.findall(
-            './/*[@class="members"]//*[@class="member"]')
-
+        matches = re.findall('class="member".*?</a>', data, re.DOTALL)
         members = []
-        for member in member_elements:
-            members.append(GroupMember(name=member.text,
-                                       member_type=member.get("type")))
+        for member in matches:
+            values = re.match('.*type="(.*?)".*?>(.*?)</a>', member)
+            members.append(GroupMember(name=values.group(2),
+                                       member_type=values.group(1)))
 
         return members
 
     def _notfoundmembers_from_xhtml(self, data):
-        root = etree.fromstring(data)
-        member_elements = root.findall(
-            './/*[@class="notfoundmembers"]//*[@class="notfoundmember"]')
-
+        matches = re.findall('class="notfoundmember".*?</span>', data,
+                             re.DOTALL)
         members = []
-        for member in member_elements:
-            members.append(member.text)
+        for member in matches:
+            name = re.match('.*>(.*?)<', member).group(1)
+            members.append(name)
 
         return members
 

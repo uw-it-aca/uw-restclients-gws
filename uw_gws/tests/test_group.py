@@ -85,6 +85,15 @@ class GWSGroupTest(TestCase):
 
         self.assertEquals(len(new_members), 4)
 
+    def test_update_roundtrip(self):
+        gws = GWS()
+        group_id = "u_acadev_bad_members"
+        members = []
+        members.append(GroupMember(member_type="uwnetid", name="_"))
+        bad_members = gws.update_members(group_id, members)
+
+        self.assertEquals(len(bad_members), 1)
+
     def test_effective_group_membership(self):
         gws = GWS()
         members = gws.get_effective_members('u_acadev_unittest')
@@ -158,6 +167,17 @@ class GWSGroupTest(TestCase):
         self.assertEquals(len(group.readers), 1)
         self.assertEquals(group.readers[0].user_type, GroupUser.NONE_TYPE)
         self.assertEquals(group.readers[0].name, "dc=all")
+
+        self.assertIsNotNone(group.creators)
+        self.assertEquals(len(group.creators), 1)
+        self.assertEquals(group.creators[0].user_type, GroupUser.UWNETID_TYPE)
+        self.assertEquals(group.creators[0].name, "jcreator")
+
+        self.assertIsNotNone(group.optins)
+        self.assertEquals(len(group.optins), 1)
+        self.assertEquals(group.optins[0].user_type, GroupUser.UWNETID_TYPE)
+        self.assertEquals(group.optins[0].name, "joptin")
+
 
         self.assertIsNotNone(group.optouts)
         self.assertEquals(len(group.optouts), 1)
