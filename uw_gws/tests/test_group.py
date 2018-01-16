@@ -15,6 +15,7 @@ class GWSGroupTest(TestCase):
                           "u_acadev_nonexistant_tester")
 
         self.assertRaises(InvalidGroupID, gws.get_group_by_id, None)
+        self.assertRaises(InvalidGroupID, gws.get_group_by_id, "x")
         self.assertRaises(InvalidGroupID, gws.get_group_by_id, "")
 
     def test_get_group(self):
