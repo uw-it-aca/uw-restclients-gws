@@ -26,7 +26,6 @@ class GWS(object):
     """
     QTRS = {'win': 'winter', 'spr': 'spring', 'sum': 'summer', 'aut': 'autumn'}
 
-
     def __init__(self, config={}):
         self.actas = config['actas'] if 'actas' in config else None
         self.templates = os.path.join(os.path.dirname(__file__), "templates/")
