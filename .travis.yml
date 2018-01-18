@@ -7,13 +7,13 @@ python:
 - '3.6'
 before_script:
 - pip install -e .
-- pip install pep8
+- pip install pycodestyle
 - pip install nose2
 - pip install coverage
 - pip install commonconf
 - pip install python-coveralls
 script:
-- pep8 --exclude=uw_gws/tests uw_gws
+- pycodestyle --exclude=uw_gws/tests uw_gws
 - coverage run uw_gws/test.py -v
 after_script:
 - coveralls
@@ -22,7 +22,6 @@ before_deploy:
 - echo $TRAVIS_TAG > uw_gws/VERSION
 deploy:
   provider: pypi
-  server: https://pypi.python.org/pypi
   user: uw-it-aca
   skip_cleanup: true
   password:

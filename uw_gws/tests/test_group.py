@@ -15,6 +15,7 @@ class GWSGroupTest(TestCase):
                           "u_acadev_nonexistant_tester")
 
         self.assertRaises(InvalidGroupID, gws.get_group_by_id, None)
+        self.assertRaises(InvalidGroupID, gws.get_group_by_id, "x")
         self.assertRaises(InvalidGroupID, gws.get_group_by_id, "")
 
     def test_get_group(self):
@@ -140,6 +141,13 @@ class GWSGroupTest(TestCase):
 
         groups = gws.search_groups(member="JAVERAGE")
         self.assertEquals(len(groups), 15)
+
+        groups = gws.search_groups(member="javerage",
+                                   type="effective")
+        self.assertEquals(len(groups), 7)
+        self.assertTrue('uw_affiliation_seattle-student' in groups[1].name)
+        self.assertTrue('uw_affiliation_staff-employee' in groups[2].name)
+
 
     def test_group_roles(self):
         group = GWS().get_group_by_id('u_eventcal_sea_1013649-editor')
