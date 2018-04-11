@@ -1,0 +1,17 @@
+{
+    "schemas": [
+        "urn:mace:washington.edu:schemas:groups:1.0"
+    ],
+    "meta": {
+        "resource": "membercount",
+        "version": "v3.0",
+        "regid": "string",
+        "id": "u_acadev_unittest",
+        "type": "effective",
+        "selfRef": "string",
+        "timestamp": 1214343146201
+    },
+    "data": {
+        "count": 3
+    }
+}

@@ -4,18 +4,17 @@ This is the interface for interacting with the Group Web Service.
 
 from uw_gws.dao import GWS_DAO
 from uw_gws.models import (
-    Group, CourseGroup, GroupReference, GroupUser, GroupMember)
+    Group, CourseGroup, GroupReference, GroupEntity, GroupMember,
+    GroupAffiliate)
 from uw_gws.exceptions import InvalidGroupID
 from restclients_core.exceptions import DataFailureException
-from jinja2 import Environment, FileSystemLoader
 try:
     from urllib.parse import urlencode
 except ImportError:
     from urllib import urlencode
 from datetime import datetime
+import json
 import re
-import os
-
 
 DAO = GWS_DAO()
 
@@ -24,11 +23,11 @@ class GWS(object):
     """
     The GWS object has methods for getting group information.
     """
+    API = '/group_sws/v3'
     QTRS = {'win': 'winter', 'spr': 'spring', 'sum': 'summer', 'aut': 'autumn'}
 
     def __init__(self, config={}):
         self.actas = config['actas'] if 'actas' in config else None
-        self.templates = os.path.join(os.path.dirname(__file__), "templates/")
 
     def search_groups(self, **kwargs):
         """
@@ -64,28 +63,17 @@ class GWS(object):
         if "instructor" in kwargs or "student" in kwargs:
             kwargs["stem"] = "course"
 
-        url = "/group_sws/v2/search?" + urlencode(kwargs)
-        response = DAO.getURL(url, self._headers({"Accept": "text/xhtml"}))
+        url = "%s/search?%s" % (self.API, urlencode(kwargs))
 
-        if response.status != 200:
-            raise DataFailureException(url, response.status, response.data)
-
-        matches = re.findall('<li class="groupreference">.*?</li>',
-                             response.data, re.DOTALL)
+        data = self._get_resource(url)
 
         groups = []
-        for element in matches:
+        for datum in data.get('data', []):
             group = GroupReference()
-            group.uwregid = re.match('.*"regid">(.*?)</span>',
-                                     element, re.DOTALL).groups(1)
-            group.title = re.match('.*"title">(.*?)</span>',
-                                   element, re.DOTALL).groups(1)
-            group.description = re.match('.*"description">(.*?)</span>',
-                                         element, re.DOTALL).groups(1)
-            group.name = re.match('.*"name".*?>(.*?)</a>',
-                                  element, re.DOTALL).groups(1)
-            group.url = re.match('.*href=".*?"', element, re.DOTALL).groups(1)
-
+            group.uwregid = datum.get('regid')
+            group.display_name = datum.get('displayName')
+            group.name = datum.get('id')
+            group.url = datum.get('url')
             groups.append(group)
 
         return groups
@@ -98,45 +86,34 @@ class GWS(object):
         if not self._is_valid_group_id(group_id):
             raise InvalidGroupID(group_id)
 
-        url = "/group_sws/v2/group/%s" % group_id
-        response = DAO.getURL(url, self._headers({"Accept": "text/xhtml"}))
+        url = "%s/group/%s" % (self.API, group_id)
 
-        if response.status != 200:
-            raise DataFailureException(url, response.status, response.data)
+        data = self._get_resource(url)
 
-        return self._group_from_xhtml(response.data)
+        return self._group_from_json(data.get("data"))
 
     def create_group(self, group):
         """
         Creates a group from the passed restclients.Group object.
         """
-        body = self._xhtml_from_group(group)
-        headers = {"Accept": "text/xhtml", "Content-Type": "text/xhtml"}
+        body = {"data": group.json_data()}
+        url = "%s/group/%s" % (self.API, group.name)
 
-        url = "/group_sws/v2/group/%s" % group.name
-        response = DAO.putURL(url, self._headers(headers), body)
+        data = self._put_resource(url, headers={}, body=body)
 
-        if response.status != 201:
-            raise DataFailureException(url, response.status, response.data)
-
-        return self._group_from_xhtml(response.data)
+        return self._group_from_json(data.get("data"))
 
     def update_group(self, group):
         """
         Updates a group from the passed restclients.Group object.
         """
-        body = self._xhtml_from_group(group)
-        headers = {"Accept": "text/xhtml",
-                   "Content-Type": "text/xhtml",
-                   "If-Match": "*"}
+        body = {"data": group.json_data()}
+        headers = {"If-Match": "*"}
+        url = "%s/group/%s" % (self.API, group.name)
 
-        url = "/group_sws/v2/group/%s" % group.name
-        response = DAO.putURL(url, self._headers(headers), body)
+        data = self._put_resource(url, headers, body)
 
-        if response.status != 200:
-            raise DataFailureException(url, response.status, response.data)
-
-        return self._group_from_xhtml(response.data)
+        return self._group_from_json(data.get("data"))
 
     def delete_group(self, group_id):
         """
@@ -145,11 +122,9 @@ class GWS(object):
         if not self._is_valid_group_id(group_id):
             raise InvalidGroupID(group_id)
 
-        url = "/group_sws/v2/group/%s" % group_id
-        response = DAO.deleteURL(url, self._headers({}))
+        url = "%s/group/%s" % (self.API, group_id)
 
-        if response.status != 200:
-            raise DataFailureException(url, response.status, response.data)
+        self._delete_resource(url)
 
         return True
 
@@ -161,13 +136,14 @@ class GWS(object):
         if not self._is_valid_group_id(group_id):
             raise InvalidGroupID(group_id)
 
-        url = "/group_sws/v2/group/%s/member" % group_id
-        response = DAO.getURL(url, self._headers({"Accept": "text/xhtml"}))
+        url = "%s/group/%s/member" % (self.API, group_id)
 
-        if response.status != 200:
-            raise DataFailureException(url, response.status, response.data)
+        data = self._get_resource(url)
 
-        return self._members_from_xhtml(response.data)
+        members = []
+        for datum in data.get("data"):
+            members.append(self._group_member_from_json(datum))
+        return members
 
     def update_members(self, group_id, members):
         """
@@ -177,16 +153,16 @@ class GWS(object):
         if not self._is_valid_group_id(group_id):
             raise InvalidGroupID(group_id)
 
-        body = self._xhtml_from_members(group_id, members)
-        headers = {"Content-Type": "text/xhtml", "If-Match": "*"}
+        body = {"data": [m.json_data() for m in members]}
+        headers = {"If-Match": "*"}
+        url = "%s/group/%s/member" % (self.API, group_id)
 
-        url = "/group_sws/v2/group/%s/member" % group_id
-        response = DAO.putURL(url, self._headers(headers), body)
+        data = self._put_resource(url, headers, body)
 
-        if response.status != 200:
-            raise DataFailureException(url, response.status, response.data)
-
-        return self._notfoundmembers_from_xhtml(response.data)
+        errors = data.get("errors", [])
+        if len(errors):
+            return errors[0].get("notFound", [])
+        return []
 
     def get_effective_members(self, group_id):
         """
@@ -196,13 +172,14 @@ class GWS(object):
         if not self._is_valid_group_id(group_id):
             raise InvalidGroupID(group_id)
 
-        url = "/group_sws/v2/group/%s/effective_member" % group_id
-        response = DAO.getURL(url, self._headers({"Accept": "text/xhtml"}))
+        url = "%s/group/%s/effective_member" % (self.API, group_id)
 
-        if response.status != 200:
-            raise DataFailureException(url, response.status, response.data)
+        data = self._get_resource(url)
 
-        return self._effective_members_from_xhtml(response.data)
+        members = []
+        for datum in data.get("data"):
+            members.append(self._group_member_from_json(datum))
+        return members
 
     def get_effective_member_count(self, group_id):
         """
@@ -212,13 +189,11 @@ class GWS(object):
         if not self._is_valid_group_id(group_id):
             raise InvalidGroupID(group_id)
 
-        url = "/group_sws/v2/group/%s/effective_member?view=count" % group_id
-        response = DAO.getURL(url, self._headers({"Accept": "text/xhtml"}))
+        url = "%s/group/%s/effective_member?view=count" % (self.API, group_id)
 
-        if response.status != 200:
-            raise DataFailureException(url, response.status, response.data)
+        data = self._get_resource(url)
 
-        count = re.match('.*count="(.*?)"', response.data, re.DOTALL).group(1)
+        count = data.get("data").get("count")
         return int(count)
 
     def is_effective_member(self, group_id, netid):
@@ -231,120 +206,86 @@ class GWS(object):
         # GWS doesn't accept EPPNs on effective member checks, for UW users
         netid = re.sub('@washington.edu', '', netid)
 
-        url = "/group_sws/v2/group/%s/effective_member/%s" % (group_id, netid)
-        response = DAO.getURL(url, self._headers({"Accept": "text/xhtml"}))
+        url = "%s/group/%s/effective_member/%s" % (self.API, group_id, netid)
 
-        if response.status == 404:
-            return False
-        elif response.status == 200:
-            return True
-        else:
-            raise DataFailureException(url, response.status, response.data)
+        try:
+            data = self._get_resource(url)
+            return True  # 200
+        except DataFailureException as ex:
+            if ex.status == 404:
+                return False
+            else:
+                raise
 
-    def _group_from_xhtml(self, data):
-        def _get_field(class_name):
-            value = re.match('.*class="%s".*?>(.*?)<' % class_name,
-                             data, re.DOTALL).group(1)
-            return value
+    def _group_entity_from_json(self, data):
+        return GroupEntity(
+            id=data.get('id'), type=data.get('type'), name=data.get('name'))
 
-        def _add_type(field, name):
-            users = re.findall('class="%s".*?</li>' % name, data, re.DOTALL)
-            for user in users:
-                values = re.match('.*type="(.*?)".*?>(.*?)</li>', user)
-                field.append(GroupMember(name=values.group(2),
-                                         member_type=values.group(1),
-                                         # This is an error that's being
-                                         # tested for :(  the model type is
-                                         # member_type
-                                         user_type=values.group(1)))
+    def _group_member_from_json(self, data):
+        member = GroupMember(id=data.get('id'), type=data.get('type'))
+        if data.get('mtype', None):
+            member.mtype = data.get('mtype')
+        if data.get('source', None):
+            member.source = data.get('source')
+        return member
 
-        group_id = _get_field('name')
+    def _group_from_json(self, data):
+        def _add_dt(timestamp):
+            return datetime.fromtimestamp(float(timestamp)/1000.0)
+
+        def _add_users(data, name, target):
+            for item in data.get(name, []):
+                target.append(self._group_entity_from_json(item))
+
+        group_id = data.get('id')
         if re.match(r'^course_', group_id):
+            course_data = data.get('course')
             group = CourseGroup()
-            group.curriculum_abbr = _get_field('course_curr').upper()
-            group.course_number = _get_field('course_no')
-            group.year = _get_field('course_year')
-            group.quarter = self.QTRS[_get_field('course_qtr')]
-            group.section_id = _get_field('course_sect').upper()
-            group.sln = _get_field('course_sln')
-
-            group.instructors = []
-
-            instructors = re.findall('class="course_instructor".*?</li>',
-                                     data, re.DOTALL)
-            for user in instructors:
-                values = re.match('.*>(.*?)</li>', user)
-                group.instructors.append(GroupMember(name=values.group(1),
-                                         member_type="uwnetid"))
+            group.curriculum_abbr = course_data.get('curriculum')
+            group.course_number = course_data.get('number')
+            group.year = course_data.get('year')
+            group.quarter = self.QTRS.get(course_data.get('quarter'))
+            group.section_id = course_data.get('section')
+            group.sln = course_data.get('sln')
+            _add_users(course_data, 'instructors', group.instructors)
         else:
             group = Group()
 
         group.name = group_id
-        group.uwregid = _get_field('regid')
-        group.title = _get_field('title')
-        group.description = _get_field('description')
-        group.contact = _get_field('contact')
-        group.authnfactor = _get_field('authnfactor')
-        group.classification = _get_field('classification')
-        group.emailenabled = _get_field('emailenabled')
-        group.dependson = _get_field('dependson')
-        group.publishemail = _get_field('publishemail')
+        group.uwregid = data.get('regid')
+        group.display_name = data.get('displayName')
+        group.description = data.get('description')
+        group.contact = data.get('contact')
+        group.authnfactor = data.get('authnfactor')
+        group.classification = data.get('classification')
+        group.dependson = data.get('dependson')
 
         try:
-            member_modified = _get_field('membermodifytime')
-            group.membership_modified = datetime.fromtimestamp(
-                float(member_modified)/1000)
-        except AttributeError:
-            group.membership_modified = None
+            group.last_modified = _add_dt(data.get('lastModified'))
+        except (AttributeError, TypeError):
+            pass
 
         try:
-            group.reporttoorig = _get_field('reporttoorig')
-        except AttributeError:
-            # Legacy class name for this attribute
-            group.reporttoorig = _get_field('reporttoowner')
+            group.membership_modified = _add_dt(data.get('lastMemberModified'))
+        except (AttributeError, TypeError):
+            pass
 
-        _add_type(group.admins, "admin")
-        _add_type(group.updaters, "updater")
-        _add_type(group.creators, "creator")
-        _add_type(group.readers, "reader")
-        _add_type(group.optins, "optin")
-        _add_type(group.optouts, "optout")
+        _add_users(data, 'admins', group.admins)
+        _add_users(data, 'updaters', group.updaters)
+        _add_users(data, 'creators', group.creators)
+        _add_users(data, 'readers', group.readers)
+        _add_users(data, 'optins', group.optins)
+        _add_users(data, 'optouts', group.optouts)
 
-        # viewers are not used according to Jim Fox
-        group.viewers = []
+        for affl_data in data.get('affiliates'):
+            affiliate = GroupAffiliate()
+            affiliate.name = affl_data.get('name')
+            affiliate.status = affl_data.get('status')
+            affiliate.forward = affl_data.get('forward')
+            _add_users(affl_data, 'sender', affiliate.senders)
+            group.affiliates.append(affiliate)
 
         return group
-
-    def _effective_members_from_xhtml(self, data):
-        matches = re.findall('class="effective_member".*?</a>', data,
-                             re.DOTALL)
-        members = []
-        for member in matches:
-            values = re.match('.*type="(.*?)".*?>(.*?)</a>', member)
-            members.append(GroupMember(name=values.group(2),
-                                       member_type=values.group(1)))
-
-        return members
-
-    def _members_from_xhtml(self, data):
-        matches = re.findall('class="member".*?</a>', data, re.DOTALL)
-        members = []
-        for member in matches:
-            values = re.match('.*type="(.*?)".*?>(.*?)</a>', member)
-            members.append(GroupMember(name=values.group(2),
-                                       member_type=values.group(1)))
-
-        return members
-
-    def _notfoundmembers_from_xhtml(self, data):
-        matches = re.findall('class="notfoundmember".*?</span>', data,
-                             re.DOTALL)
-        members = []
-        for member in matches:
-            name = re.match('.*>(.*?)<', member).group(1)
-            members.append(name)
-
-        return members
 
     def _is_valid_group_id(self, group_id):
         if (group_id is None or
@@ -353,27 +294,36 @@ class GWS(object):
 
         return True
 
-    def _headers(self, headers):
+    def _get_resource(self, url, headers={}):
+        headers["Accept"] = "application/json"
         if self.actas:
-            headers = self._add_header(headers, "X-UW-Act-as", self.actas)
-        return headers
+            headers["X-UW-Act-as"] = self.actas
 
-    def _add_header(self, headers, header, value):
-        if not headers:
-            return {header: value}
+        response = DAO.getURL(url, headers)
 
-        headers[header] = value
-        return headers
+        if response.status != 200:
+            raise DataFailureException(url, response.status, response.data)
 
-    def _xhtml_from_group(self, group):
-        return self._render_template("group.xhtml", context={"group": group})
+        return json.loads(response.data)
 
-    def _xhtml_from_members(self, group_id, members):
-        return self._render_template(
-            "members.xhtml",
-            context={"group_id": group_id, "members": members})
+    def _put_resource(self, url, headers={}, body={}):
+        headers["Accept"] = "application/json"
+        headers["Content-Type"] = "application/json"
+        if self.actas:
+            headers["X-UW-Act-as"] = self.actas
 
-    def _render_template(self, template, context={}):
-        return Environment(
-                loader=FileSystemLoader(self.templates)
-            ).get_template(template).render(context)
+        response = DAO.putURL(url, headers, json.dumps(body))
+
+        if response.status != 200:
+            raise DataFailureException(url, response.status, response.data)
+
+        return json.loads(response.data)
+
+    def _delete_resource(self, url, headers={}):
+        if self.actas:
+            headers["X-UW-Act-as"] = self.actas
+
+        response = DAO.deleteURL(url, headers)
+
+        if response.status != 200:
+            raise DataFailureException(url, response.status, response.data)
