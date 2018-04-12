@@ -97,6 +97,9 @@ class GWSGroupTest(TestCase):
         gws = GWS()
         members = gws.get_members('u_acadev_unittest')
         self.assertEquals(len(members), 2)
+        self.assertIn(GroupMember(type="uwnetid", id="eight"), members)
+        self.assertNotIn(GroupMember(type="eppn", id="j@washington.edu"),
+                         members)
 
     @mock.patch.object(GWS, '_put_resource')
     def test_update_members(self, mock_put):
@@ -207,30 +210,36 @@ class GWSGroupTest(TestCase):
 
         self.assertIsNotNone(group.admins)
         self.assertEquals(len(group.admins), 2)
-        self.assertEquals(group.admins[0].type, GroupEntity.GROUP_TYPE)
-        self.assertEquals(group.admins[0].id, "u_javerage_admin")
+        self.assertIn(
+            GroupEntity(id="u_javerage_admin", type=GroupEntity.GROUP_TYPE),
+            group.admins)
 
         self.assertIsNotNone(group.updaters)
         self.assertEquals(len(group.updaters), 1)
-        self.assertEquals(group.updaters[0].type, GroupEntity.GROUP_TYPE)
-        self.assertEquals(group.updaters[0].id, "u_javerage_update")
+        self.assertIn(
+            GroupEntity(id="u_javerage_update", type=GroupEntity.GROUP_TYPE),
+            group.updaters)
 
         self.assertIsNotNone(group.readers)
         self.assertEquals(len(group.readers), 1)
-        self.assertEquals(group.readers[0].type, GroupEntity.SET_TYPE)
-        self.assertEquals(group.readers[0].id, "all")
+        self.assertIn(
+            GroupEntity(id="all", type=GroupEntity.SET_TYPE),
+            group.readers)
 
         self.assertIsNotNone(group.creators)
         self.assertEquals(len(group.creators), 1)
-        self.assertEquals(group.creators[0].type, GroupEntity.UWNETID_TYPE)
-        self.assertEquals(group.creators[0].id, "jcreator")
+        self.assertIn(
+            GroupEntity(id="jcreator", type=GroupEntity.UWNETID_TYPE),
+            group.creators)
 
         self.assertIsNotNone(group.optins)
         self.assertEquals(len(group.optins), 1)
-        self.assertEquals(group.optins[0].type, GroupEntity.UWNETID_TYPE)
-        self.assertEquals(group.optins[0].id, "joptin")
+        self.assertIn(
+            GroupEntity(id="joptin", type=GroupEntity.UWNETID_TYPE),
+            group.optins)
 
         self.assertIsNotNone(group.optouts)
         self.assertEquals(len(group.optouts), 1)
-        self.assertEquals(group.optouts[0].type, GroupEntity.SET_TYPE)
-        self.assertEquals(group.optouts[0].id, "all")
+        self.assertIn(
+            GroupEntity(id="all", type=GroupEntity.SET_TYPE),
+            group.optouts)
