@@ -1,0 +1,13 @@
+{
+  "schemas": [
+    "urn:mace:washington.edu:schemas:groups:1.0"
+  ],
+  "errors": [
+    {
+      "status": 200,
+      "notFound": [
+        "_"
+      ]
+    }
+  ]
+}
