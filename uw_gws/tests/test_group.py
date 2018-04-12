@@ -73,6 +73,26 @@ class GWSGroupTest(TestCase):
         result = gws.delete_group(group.name)
         self.assertEquals(result, True)
 
+    def test_group_member(self):
+        member1 = GroupMember(type="uwnetid", id="javerage")
+        self.assertEquals(member1.is_uwnetid(), True)
+
+        member2 = GroupMember(type="uwnetid", id="javerage")
+        self.assertEquals(member2.type, "uwnetid")
+        self.assertEquals(member2.id, "javerage")
+        self.assertEquals(member2.mtype, GroupMember.DIRECT_MTYPE)
+        self.assertEquals(member1 == member2, True)
+
+        member3 = GroupMember(type="eppn", id="javerage@washington.edu")
+        self.assertEquals(member3.is_uwnetid(), False)
+        self.assertEquals(member3.is_eppn(), True)
+        self.assertEquals(member1 == member3, False)
+
+        member4 = GroupMember(type="group", id="u_acadev_unittest")
+        self.assertEquals(member4.is_uwnetid(), False)
+        self.assertEquals(member4.is_group(), True)
+        self.assertEquals(member1 == member4, False)
+
     def test_group_membership(self):
         gws = GWS()
         members = gws.get_members('u_acadev_unittest')
@@ -107,7 +127,7 @@ class GWSGroupTest(TestCase):
             {'data': [{'mtype': 'direct', 'source': None,
                        'type': 'uwnetid', 'id': 'javerage'},
                       {'mtype': 'direct', 'source': None,
-                        'type': 'uwnetid', 'id': 'seven'},
+                       'type': 'uwnetid', 'id': 'seven'},
                       {'mtype': 'direct', 'source': None,
                        'type': 'uwnetid', 'id': 'eight'},
                       {'mtype': 'direct', 'source': None,
@@ -170,6 +190,17 @@ class GWSGroupTest(TestCase):
 
         groups = gws.search_groups(member="javerage", type="effective")
         self.assertEquals(len(groups), 7)
+
+    def test_affiliates(self):
+        group = GWS().get_group_by_id('u_acadev_unittest')
+        self.assertEquals(len(group.affiliates), 0)
+
+        group = GWS().get_group_by_id('u_acadev_tester')
+        self.assertEquals(len(group.affiliates), 1)
+
+        affiliate = group.affiliates[0]
+        self.assertEquals(affiliate.name, 'google')
+        self.assertEquals(affiliate.is_active(), True)
 
     def test_group_roles(self):
         group = GWS().get_group_by_id('u_acadev_tester')

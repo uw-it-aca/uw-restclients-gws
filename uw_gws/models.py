@@ -205,13 +205,24 @@ class GroupAffiliate(models.Model):
         (RADIUS_NAME, "Radius"),
     )
 
+    ACTIVE_STATUS = "active"
+    INACTIVE_STATUS = "inactive"
+
+    STATUS_CHOICES = (
+        (ACTIVE_STATUS, ACTIVE_STATUS),
+        (INACTIVE_STATUS, INACTIVE_STATUS),
+    )
+
     name = models.CharField(max_length=20, choices=NAME_CHOICES)
-    status = models.CharField(max_length=16)
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES)
     forward = models.CharField(max_length=50)
 
     def __init__(self, *args, **kwargs):
         super(GroupAffiliate, self).__init__(*args, **kwargs)
         self.senders = []
+
+    def is_active(self):
+        return self.status == self.ACTIVE_STATUS
 
     def json_data(self):
         return {
