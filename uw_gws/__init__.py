@@ -25,6 +25,7 @@ class GWS(object):
     """
     API = '/group_sws/v3'
     QTRS = {'win': 'winter', 'spr': 'spring', 'sum': 'summer', 'aut': 'autumn'}
+    RE_GROUP_ID = re.compile(r'^[a-z0-9][\w\.-]+$', re.I)
 
     def __init__(self, config={}):
         self.actas = config['actas'] if 'actas' in config else None
@@ -83,8 +84,7 @@ class GWS(object):
         Returns a restclients.Group object for the group identified by the
         passed group ID.
         """
-        if not self._is_valid_group_id(group_id):
-            raise InvalidGroupID(group_id)
+        self._valid_group_id(group_id)
 
         url = "%s/group/%s" % (self.API, group_id)
 
@@ -96,6 +96,8 @@ class GWS(object):
         """
         Creates a group from the passed restclients.Group object.
         """
+        self._valid_group_id(group.id)
+
         body = {"data": group.json_data()}
         url = "%s/group/%s" % (self.API, group.name)
 
@@ -107,6 +109,8 @@ class GWS(object):
         """
         Updates a group from the passed restclients.Group object.
         """
+        self._valid_group_id(group.id)
+
         body = {"data": group.json_data()}
         headers = {"If-Match": "*"}
         url = "%s/group/%s" % (self.API, group.name)
@@ -119,8 +123,7 @@ class GWS(object):
         """
         Deletes the group identified by the passed group ID.
         """
-        if not self._is_valid_group_id(group_id):
-            raise InvalidGroupID(group_id)
+        self._valid_group_id(group_id)
 
         url = "%s/group/%s" % (self.API, group_id)
 
@@ -133,8 +136,7 @@ class GWS(object):
         Returns a list of restclients.GroupMember objects for the group
         identified by the passed group ID.
         """
-        if not self._is_valid_group_id(group_id):
-            raise InvalidGroupID(group_id)
+        self._valid_group_id(group_id)
 
         url = "%s/group/%s/member" % (self.API, group_id)
 
@@ -150,8 +152,7 @@ class GWS(object):
         Updates the membership of the group represented by the passed group id.
         Returns a list of members not found.
         """
-        if not self._is_valid_group_id(group_id):
-            raise InvalidGroupID(group_id)
+        self._valid_group_id(group_id)
 
         body = {"data": [m.json_data() for m in members]}
         headers = {"If-Match": "*"}
@@ -169,8 +170,7 @@ class GWS(object):
         Returns a list of effective restclients.GroupMember objects for the
         group identified by the passed group ID.
         """
-        if not self._is_valid_group_id(group_id):
-            raise InvalidGroupID(group_id)
+        self._valid_group_id(group_id)
 
         url = "%s/group/%s/effective_member" % (self.API, group_id)
 
@@ -186,8 +186,7 @@ class GWS(object):
         Returns a count of effective members for the group identified by the
         passed group ID.
         """
-        if not self._is_valid_group_id(group_id):
-            raise InvalidGroupID(group_id)
+        self._valid_group_id(group_id)
 
         url = "%s/group/%s/effective_member?view=count" % (self.API, group_id)
 
@@ -200,8 +199,7 @@ class GWS(object):
         """
         Returns True if the netid is in the group, False otherwise.
         """
-        if not self._is_valid_group_id(group_id):
-            raise InvalidGroupID(group_id)
+        self._valid_group_id(group_id)
 
         # GWS doesn't accept EPPNs on effective member checks, for UW users
         netid = re.sub('@washington.edu', '', netid)
@@ -287,12 +285,9 @@ class GWS(object):
 
         return group
 
-    def _is_valid_group_id(self, group_id):
-        if (group_id is None or
-                not re.match(r'^[a-z0-9][\w\.-]+$', group_id, re.I)):
-            return False
-
-        return True
+    def _valid_group_id(self, group_id):
+        if (group_id is None or not self.RE_GROUP_ID.match(group_id)):
+            raise InvalidGroupID(group_id)
 
     def _get_resource(self, url, headers={}):
         headers["Accept"] = "application/json"
