@@ -229,5 +229,5 @@ class GroupAffiliate(models.Model):
             "name": self.name,
             "status": self.status,
             "forward": self.forward,
-            "sender": [],
+            "sender": [s.json_data() for s in self.senders],
         }

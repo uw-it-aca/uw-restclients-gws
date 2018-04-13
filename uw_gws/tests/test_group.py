@@ -204,6 +204,7 @@ class GWSGroupTest(TestCase):
         affiliate = group.affiliates[0]
         self.assertEquals(affiliate.name, 'google')
         self.assertEquals(affiliate.is_active(), True)
+        self.assertEquals(len(affiliate.senders), 0)
 
     def test_group_roles(self):
         group = GWS().get_group_by_id('u_acadev_tester')
