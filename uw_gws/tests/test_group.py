@@ -10,11 +10,11 @@ import mock
 
 @fdao_gws_override
 class GWSGroupTest(TestCase):
-    def test_get_nonexistant_group(self):
+    def test_get_nonexistent_group(self):
         gws = GWS()
         self.assertRaises(DataFailureException,
                           gws.get_group_by_id,
-                          "u_acadev_nonexistant_tester")
+                          "u_acadev_nonexistent_tester")
 
         self.assertRaises(InvalidGroupID, gws.get_group_by_id, None)
         self.assertRaises(InvalidGroupID, gws.get_group_by_id, "x")
@@ -74,21 +74,21 @@ class GWSGroupTest(TestCase):
         self.assertEquals(result, True)
 
     def test_group_member(self):
-        member1 = GroupMember(type="uwnetid", id="javerage")
+        member1 = GroupMember(type="uwnetid", name="javerage")
         self.assertEquals(member1.is_uwnetid(), True)
 
-        member2 = GroupMember(type="uwnetid", id="javerage")
+        member2 = GroupMember(type="uwnetid", name="javerage")
         self.assertEquals(member2.type, "uwnetid")
-        self.assertEquals(member2.id, "javerage")
+        self.assertEquals(member2.name, "javerage")
         self.assertEquals(member2.mtype, GroupMember.DIRECT_MTYPE)
         self.assertEquals(member1 == member2, True)
 
-        member3 = GroupMember(type="eppn", id="javerage@washington.edu")
+        member3 = GroupMember(type="eppn", name="javerage@washington.edu")
         self.assertEquals(member3.is_uwnetid(), False)
         self.assertEquals(member3.is_eppn(), True)
         self.assertEquals(member1 == member3, False)
 
-        member4 = GroupMember(type="group", id="u_acadev_unittest")
+        member4 = GroupMember(type="group", name="u_acadev_unittest")
         self.assertEquals(member4.is_uwnetid(), False)
         self.assertEquals(member4.is_group(), True)
         self.assertEquals(member1 == member4, False)
@@ -97,8 +97,8 @@ class GWSGroupTest(TestCase):
         gws = GWS()
         members = gws.get_members('u_acadev_unittest')
         self.assertEquals(len(members), 2)
-        self.assertIn(GroupMember(type="uwnetid", id="eight"), members)
-        self.assertNotIn(GroupMember(type="eppn", id="j@washington.edu"),
+        self.assertIn(GroupMember(type="uwnetid", name="eight"), members)
+        self.assertNotIn(GroupMember(type="eppn", name="j@washington.edu"),
                          members)
 
     @mock.patch.object(GWS, '_put_resource')
@@ -108,7 +108,7 @@ class GWSGroupTest(TestCase):
 
         self.assertEquals(len(members), 2)
 
-        members.remove(GroupMember(type="uwnetid", id="eight"))
+        members.remove(GroupMember(type="uwnetid", name="eight"))
 
         res = gws.update_members('u_acadev_unittest', members)
 
@@ -118,9 +118,9 @@ class GWSGroupTest(TestCase):
             {'data': [{'mtype': 'direct', 'source': None,
                        'type': 'uwnetid', 'id': 'javerage'}]})
 
-        members.append(GroupMember(type="uwnetid", id="seven"))
-        members.append(GroupMember(type="uwnetid", id="eight"))
-        members.append(GroupMember(type="uwnetid", id="nine"))
+        members.append(GroupMember(type="uwnetid", name="seven"))
+        members.append(GroupMember(type="uwnetid", name="eight"))
+        members.append(GroupMember(type="uwnetid", name="nine"))
 
         res = gws.update_members('u_acadev_unittest', members)
 
@@ -156,11 +156,11 @@ class GWSGroupTest(TestCase):
         has_eight = False
 
         for member in members:
-            if member.id == "seven":
+            if member.name == "seven":
                 has_seven = True
-            elif member.id == "javerage":
+            elif member.name == "javerage":
                 has_javerage = True
-            elif member.id == "eight":
+            elif member.name == "eight":
                 has_eight = True
 
         self.assertEquals(has_seven, True)
@@ -212,35 +212,35 @@ class GWSGroupTest(TestCase):
         self.assertIsNotNone(group.admins)
         self.assertEquals(len(group.admins), 2)
         self.assertIn(
-            GroupEntity(id="u_javerage_admin", type=GroupEntity.GROUP_TYPE),
+            GroupEntity(name="u_javerage_admin", type=GroupEntity.GROUP_TYPE),
             group.admins)
 
         self.assertIsNotNone(group.updaters)
         self.assertEquals(len(group.updaters), 1)
         self.assertIn(
-            GroupEntity(id="u_javerage_update", type=GroupEntity.GROUP_TYPE),
+            GroupEntity(name="u_javerage_update", type=GroupEntity.GROUP_TYPE),
             group.updaters)
 
         self.assertIsNotNone(group.readers)
         self.assertEquals(len(group.readers), 1)
         self.assertIn(
-            GroupEntity(id="all", type=GroupEntity.SET_TYPE),
+            GroupEntity(name="all", type=GroupEntity.SET_TYPE),
             group.readers)
 
         self.assertIsNotNone(group.creators)
         self.assertEquals(len(group.creators), 1)
         self.assertIn(
-            GroupEntity(id="jcreator", type=GroupEntity.UWNETID_TYPE),
+            GroupEntity(name="jcreator", type=GroupEntity.UWNETID_TYPE),
             group.creators)
 
         self.assertIsNotNone(group.optins)
         self.assertEquals(len(group.optins), 1)
         self.assertIn(
-            GroupEntity(id="joptin", type=GroupEntity.UWNETID_TYPE),
+            GroupEntity(name="joptin", type=GroupEntity.UWNETID_TYPE),
             group.optins)
 
         self.assertIsNotNone(group.optouts)
         self.assertEquals(len(group.optouts), 1)
         self.assertIn(
-            GroupEntity(id="all", type=GroupEntity.SET_TYPE),
+            GroupEntity(name="all", type=GroupEntity.SET_TYPE),
             group.optouts)

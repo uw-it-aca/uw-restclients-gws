@@ -143,8 +143,8 @@ class GroupEntity(models.Model):
         (UWWI_TYPE, "UWWI"),
     )
 
-    id = models.CharField(max_length=50)
-    name = models.CharField(max_length=500, null=True)
+    name = models.CharField(max_length=50)
+    display_name = models.CharField(max_length=500, null=True)
     type = models.SlugField(max_length=8, choices=TYPE_CHOICES)
 
     def is_uwnetid(self):
@@ -157,13 +157,18 @@ class GroupEntity(models.Model):
         return self.type == self.GROUP_TYPE
 
     def json_data(self):
-        return {"name": self.name, "id": self.id, "type": self.type}
+        return {
+            "id": self.name,
+            "name": self.display_name,
+            "type": self.type
+        }
 
     def __eq__(self, other):
-        return self.id == other.id and self.type == other.type
+        return self.name == other.name and self.type == other.type
 
     def __str__(self):
-        return "id: %s, name: %s, type: %s" % (self.id, self.name, self.type)
+        return "name: %s, display_name: %s, type: %s" % (
+            self.name, self.display_name, self.type)
 
 
 class GroupMember(GroupEntity):
@@ -181,15 +186,15 @@ class GroupMember(GroupEntity):
 
     def json_data(self):
         return {
-            "id": self.id,
+            "id": self.name,
             "type": self.type,
             "mtype": self.mtype,
             "source": self.source,
         }
 
     def __str__(self):
-        return "id: %s, type: %s, mtype: %s, source: %s" % (
-            self.id, self.type, self.mtype, self.source)
+        return "name: %s, type: %s, mtype: %s, source: %s" % (
+            self.name, self.type, self.mtype, self.source)
 
 
 class GroupAffiliate(models.Model):

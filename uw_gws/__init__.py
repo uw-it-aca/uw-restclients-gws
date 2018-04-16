@@ -216,11 +216,12 @@ class GWS(object):
                 raise
 
     def _group_entity_from_json(self, data):
-        return GroupEntity(
-            id=data.get('id'), type=data.get('type'), name=data.get('name'))
+        return GroupEntity(name=data.get('id'),
+                           type=data.get('type'),
+                           display_name=data.get('name'))
 
     def _group_member_from_json(self, data):
-        member = GroupMember(id=data.get('id'), type=data.get('type'))
+        member = GroupMember(name=data.get('id'), type=data.get('type'))
         if data.get('mtype', None):
             member.mtype = data.get('mtype')
         if data.get('source', None):
