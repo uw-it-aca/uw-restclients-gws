@@ -1,8 +1,14 @@
 from restclients_core import models
+import json
 import time
 
 
-class GroupReference(models.Model):
+class GWSModel(models.Model):
+    def __str__(self):
+        return json.dumps(self.json_data(), indent=4)
+
+
+class GroupReference(GWSModel):
     name = models.CharField(max_length=500)
     uwregid = models.CharField(max_length=32)
     display_name = models.CharField(max_length=500)
@@ -16,12 +22,8 @@ class GroupReference(models.Model):
             "url": self.url,
         }
 
-    def __str__(self):
-        return "uwregid: %s, name: %s, display_name: %s, url: %s" % (
-            self.uwregid, self.name, self.display_name, self.url)
 
-
-class Group(models.Model):
+class Group(GWSModel):
     CLASSIFICATION_NONE = "u"
     CLASSIFICATION_RESTRICTED = "r"
     CLASSIFICATION_CONFIDENTIAL = "c"
@@ -46,7 +48,7 @@ class Group(models.Model):
     dependson = models.CharField(max_length=500, null=True)
 
     def __init__(self, *args, **kwargs):
-        super(Group, self).__init__(*args, **kwargs)
+        super(GWSModel, self).__init__(*args, **kwargs)
         self.admins = []
         self.creators = []
         self.optins = []
@@ -54,10 +56,6 @@ class Group(models.Model):
         self.readers = []
         self.updaters = []
         self.affiliates = []
-
-    def __str__(self):
-        return "name: %s, uwregid: %s, display_name: %s, description: %s" % (
-            self.name, self.uwregid, self.display_name, self.description)
 
     def _to_timestamp(self, dt):
         if dt is not None:
@@ -126,7 +124,7 @@ class CourseGroup(Group):
         return data
 
 
-class GroupEntity(models.Model):
+class GroupEntity(GWSModel):
     UWNETID_TYPE = "uwnetid"
     EPPN_TYPE = "eppn"
     GROUP_TYPE = "group"
@@ -166,10 +164,6 @@ class GroupEntity(models.Model):
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type
 
-    def __str__(self):
-        return "name: %s, display_name: %s, type: %s" % (
-            self.name, self.display_name, self.type)
-
 
 class GroupMember(GroupEntity):
     DIRECT_MTYPE = "direct"
@@ -192,12 +186,8 @@ class GroupMember(GroupEntity):
             "source": self.source,
         }
 
-    def __str__(self):
-        return "name: %s, type: %s, mtype: %s, source: %s" % (
-            self.name, self.type, self.mtype, self.source)
 
-
-class GroupAffiliate(models.Model):
+class GroupAffiliate(GWSModel):
     UWNETID_NAME = "uwnetid"
     GOOGLE_NAME = "google"
     EMAIL_NAME = "email"
@@ -223,7 +213,7 @@ class GroupAffiliate(models.Model):
     forward = models.CharField(max_length=50)
 
     def __init__(self, *args, **kwargs):
-        super(GroupAffiliate, self).__init__(*args, **kwargs)
+        super(GWSModel, self).__init__(*args, **kwargs)
         self.senders = []
 
     def is_active(self):
