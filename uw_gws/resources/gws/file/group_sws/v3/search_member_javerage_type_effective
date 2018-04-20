@@ -1,0 +1,64 @@
+{
+    "schemas": [
+        "urn:mace:washington.edu:schemas:groups:1.0"
+    ],
+    "meta": {
+        "resourceType": "search",
+        "version": "v3.0",
+        "searchParameters": {
+        "name": "string",
+        "stem": "string",
+        "scope": "string",
+        "member": "javerage",
+        "type": "effective",
+        "owner": "string",
+        "affiliate": "string",
+        "instructor": "string"
+    },
+    "selfRef": "https://iam-ws.u.washington.edu/group_sws/v3/group/a1681c3fcba3f54f759e6c9432004381"
+    },
+    "data": [
+        {
+            "regid": "5d574a4fad054a9b838b6601a5a6a3c3",
+            "url": "/group_sws/v2/group/u_mediaamp_uwall",
+            "displayName": "UW All",
+            "id": "u_mediaamp_uwall"
+        },
+        {
+            "regid": "8a6449feb1f14fd88d8785aa05931687",
+            "url": "/group_sws/v2/group/uw_affiliation_seattle-student",
+            "displayName": "Current Seattle students",
+            "id": "uw_affiliation_seattle-student"
+        },
+        {
+            "regid": "642d545076c7481a9d27e9ccf936b381",
+            "url": "/group_sws/v2/group/uw_affiliation_staff-employee",
+            "displayName": "UW Staff Employees",
+            "id": "uw_affiliation_staff-employee"
+        },
+        {
+            "regid": "93b5ea5d2859e6de68e45b43880d6d9f",
+            "url": "/group_sws/v2/group/uw_affiliation_undergraduate",
+            "displayName": "UW Undergraduate Students",
+            "id": "uw_affiliation_undergraduate"
+        },
+        {
+            "regid": "2364284941d949959de70c672b616084",
+            "url": "/group_sws/v2/group/uw_employee",
+            "displayName": "UW Employees",
+            "id": "uw_employee"
+        },
+        {
+            "regid": "a8fedf2f303145f787cf4f30e6ff9632",
+            "url": "/group_sws/v2/group/uw_member",
+            "displayName": "UW members",
+            "id": "uw_member"
+        },
+        {
+            "regid": "9b9dab58766a25b1ce605968a347b4ee",
+            "url": "/group_sws/v2/group/uw_student",
+            "displayName": "UW Students",
+            "id": "uw_student"
+        }
+    ]
+}

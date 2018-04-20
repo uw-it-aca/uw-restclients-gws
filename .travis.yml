@@ -2,8 +2,6 @@ sudo: false
 language: python
 python:
 - '2.7'
-- '3.4'
-- '3.5'
 - '3.6'
 before_script:
 - pip install -e .
@@ -28,4 +26,4 @@ deploy:
     secure: oxoDsUKzhmN1XuxquNcLig3IyKa2vU0for6jakj0vlqV90xVoSMS7ia1XVa9CIvnVRYjSvoqPzznPbJUmX9gXd2SI2ZfgSoDviaIlSN/G7iT6V39Go80B10RYroBaQVMcYKLbbJRiaFPdqXVPQF1LUGLxpWtpxh0PQEJVu8e1h9NoCyf+84YyhLcgRNf3mGvEoqqwoyvWWoZoktpnCna8CrJlgC0iDYcZUF4f2iUT7EGkd3yKjVRDbr5nc5rkDOncehioyIEeR66Y84x/1N3OgBIoraBhs+TvMcSXzDsyCOoAOMQaPZMDSpUXlQCrkPJxZjDBzsN14u29XlH+EdyqFSa3DmfodM1fYaDQ/iOHac7Cs633nBa17gAr4mTAOy6TVDFbKoQzKROKZc5TNRb7iuIeu5HsSv94+LuU+F3uwqFrI6/XOgU9a8aeT47hO5xCQvwQlcJPtck3V6HT4jrL12QtF00Ybras6ZyL0PFrLOYb4VRXgffU2KWueW8Eqzs4MdSjx2C46154En1iz9w+/h8Kq5pC3PTBbs6Fn9zgU8iXE9pX5qrRpUnLaoI/PSRciqbV2O+/QZJjrc5arT1JwuobzH8hmCb4TGxsZRB5UKH0TpJhIsaNJt6qDnWu4Kv/kc3urYWLTM5mJy8PTsFRN/bDyFSYbyiXrJm+NiJ24E=
   on:
     tags: true
-    python: '3.5'
+    python: '3.6'

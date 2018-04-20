@@ -1,0 +1,112 @@
+{
+    "schemas": [
+        "urn:mace:washington.edu:schemas:groups:1.0"
+    ],
+    "meta": {
+        "resourceType": "search",
+        "version": "v3.0",
+        "searchParameters": {
+        "name": "string",
+        "stem": "string",
+        "scope": "string",
+        "member": "javerage",
+        "type": "string",
+        "owner": "string",
+        "affiliate": "string",
+        "instructor": "string"
+    },
+    "selfRef": "https://iam-ws.u.washington.edu/group_sws/v3/group/a1681c3fcba3f54f759e6c9432004381"
+    },
+    "data": [
+        {
+            "regid": "09879bf9ff2b636b485e20c95886be9b",
+            "url": "/group_sws/v2/group/09879bf9ff2b636b485e20c95886be9b",
+            "displayName": "Access and Use Agreement for Institutional Information",
+            "id": "u_agreement_idaa"
+        },
+        {
+            "regid": "783b786fea534b158389d24332d2f817",
+            "url": "/group_sws/v2/group/783b786fea534b158389d24332d2f817",
+            "displayName": "u_astra_testrole_approver",
+            "id": "u_astra_testrole_approver"
+        },
+        {
+            "regid": "bce4a1ecaa7e43f59b1b2703c17419e9",
+            "url": "/group_sws/v2/group/bce4a1ecaa7e43f59b1b2703c17419e9",
+            "displayName": "u_astra_testrole_generic",
+            "id": "u_astra_testrole_generic"
+        },
+        {
+            "regid": "bea84ca7cbce4eac828c2c32ed8a074d",
+            "url": "/group_sws/v2/group/bea84ca7cbce4eac828c2c32ed8a074d",
+            "displayName": "u_astratst_testrole_approver",
+            "id": "u_astratst_testrole_approver"
+        },
+{
+            "regid": "a50a3310dc0f40c4a005d01275ad06a6",
+            "url": "/group_sws/v2/group/a50a3310dc0f40c4a005d01275ad06a6",
+            "displayName": "u_astratst_testrole_generic",
+            "id": "u_astratst_testrole_generic"
+        },
+        {
+            "regid": "a1c63dca571fc93a7b4b13c06be0e2ea",
+            "url": "/group_sws/v2/group/a1c63dca571fc93a7b4b13c06be0e2ea",
+            "displayName": "Test Accounts",
+            "id": "u_ccpilot_testaccounts"
+        },
+        {
+            "regid": "e4323874a32743c1b7d1fdadab248426",
+            "url": "/group_sws/v2/group/e4323874a32743c1b7d1fdadab248426",
+            "displayName": "Mailchimp users for UW Today/Week in Review",
+            "id": "u_cheiland_mailchimp"
+        },
+        {
+            "regid": "cfa587804ee9436887828f6e0791471d",
+            "url": "/group_sws/v2/group/cfa587804ee9436887828f6e0791471d",
+            "displayName": "u_nebula_wwwuudev",
+            "id": "u_nebula_wwwuudev"
+        },
+        {
+            "regid": "fd44875f712e4830853d7ac96590cb56",
+            "url": "/group_sws/v2/group/fd44875f712e4830853d7ac96590cb56",
+            "displayName": "u_sandstro_wwwuudev",
+            "id": "u_sandstro_wwwuudev"
+        },
+        {
+            "regid": "6d261678ea39491453424328e4666a39",
+            "url": "/group_sws/v2/group/6d261678ea39491453424328e4666a39",
+            "displayName": "Shuksan subscription 81",
+            "id": "u_subman_eres"
+        },
+{
+            "regid": "40442595174b5ebf53167252b5cbcc34",
+            "url": "/group_sws/v2/group/40442595174b5ebf53167252b5cbcc34",
+            "displayName": "Shuksan subscription 80",
+            "id": "u_subman_ezproxy"
+        },
+        {
+            "regid": "3768c3bffe4c13875088787f886f62ee",
+            "url": "/group_sws/v2/group/3768c3bffe4c13875088787f886f62ee",
+            "displayName": "ILLiad Users (Subscription 85)",
+            "id": "u_subman_illusers"
+        },
+        {
+            "regid": "2364284941d949959de70c672b616084",
+            "url": "/group_sws/v2/group/2364284941d949959de70c672b616084",
+            "displayName": "UW Employees",
+            "id": "uw_employee"
+        },
+        {
+            "regid": "956ad2f5bd7844ae862016b2999e9e06",
+            "url": "/group_sws/v2/group/956ad2f5bd7844ae862016b2999e9e06",
+            "displayName": "UW Members",
+            "id": "uw_member"
+        },
+        {
+            "regid": "fb7b6298b70c1071a7d42f637a1166a3",
+            "url": "/group_sws/v2/group/fb7b6298b70c1071a7d42f637a1166a3",
+            "displayName": "UW Staff",
+            "id": "uw_staff"
+        }
+    ]
+}
