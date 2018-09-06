@@ -2,19 +2,17 @@
 This is the interface for interacting with the Group Web Service.
 """
 
+from datetime import datetime
+import json
+import re
+from urllib.parse import urlencode
+from restclients_core.exceptions import DataFailureException
 from uw_gws.dao import GWS_DAO
 from uw_gws.models import (
     Group, CourseGroup, GroupReference, GroupEntity, GroupMember,
     GroupAffiliate)
 from uw_gws.exceptions import InvalidGroupID
-from restclients_core.exceptions import DataFailureException
-try:
-    from urllib.parse import urlencode
-except ImportError:
-    from urllib import urlencode
-from datetime import datetime
-import json
-import re
+
 
 DAO = GWS_DAO()
 
