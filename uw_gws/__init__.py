@@ -62,7 +62,7 @@ class GWS(object):
         if "instructor" in kwargs or "student" in kwargs:
             kwargs["stem"] = "course"
 
-        url = "%s/search?%s" % (self.API, urlencode(kwargs))
+        url = "{}/search?{}".format(self.API, urlencode(kwargs))
 
         data = self._get_resource(url)
 
@@ -84,7 +84,7 @@ class GWS(object):
         """
         self._valid_group_id(group_id)
 
-        url = "%s/group/%s" % (self.API, group_id)
+        url = "{}/group/{}".format(self.API, group_id)
 
         data = self._get_resource(url)
 
@@ -97,7 +97,7 @@ class GWS(object):
         self._valid_group_id(group.id)
 
         body = {"data": group.json_data()}
-        url = "%s/group/%s" % (self.API, group.name)
+        url = "{}/group/{}".format(self.API, group.name)
 
         data = self._put_resource(url, headers={}, body=body)
 
@@ -111,7 +111,7 @@ class GWS(object):
 
         body = {"data": group.json_data()}
         headers = {"If-Match": "*"}
-        url = "%s/group/%s" % (self.API, group.name)
+        url = "{}/group/{}".format(self.API, group.name)
 
         data = self._put_resource(url, headers, body)
 
@@ -123,7 +123,7 @@ class GWS(object):
         """
         self._valid_group_id(group_id)
 
-        url = "%s/group/%s" % (self.API, group_id)
+        url = "{}/group/{}".format(self.API, group_id)
 
         self._delete_resource(url)
 
@@ -136,7 +136,7 @@ class GWS(object):
         """
         self._valid_group_id(group_id)
 
-        url = "%s/group/%s/member" % (self.API, group_id)
+        url = "{}/group/{}/member".format(self.API, group_id)
 
         data = self._get_resource(url)
 
@@ -154,7 +154,7 @@ class GWS(object):
 
         body = {"data": [m.json_data() for m in members]}
         headers = {"If-Match": "*"}
-        url = "%s/group/%s/member" % (self.API, group_id)
+        url = "{}/group/{}/member".format(self.API, group_id)
 
         data = self._put_resource(url, headers, body)
 
@@ -170,7 +170,7 @@ class GWS(object):
         """
         self._valid_group_id(group_id)
 
-        url = "%s/group/%s/effective_member" % (self.API, group_id)
+        url = "{}/group/{}/effective_member".format(self.API, group_id)
 
         data = self._get_resource(url)
 
@@ -186,7 +186,8 @@ class GWS(object):
         """
         self._valid_group_id(group_id)
 
-        url = "%s/group/%s/effective_member?view=count" % (self.API, group_id)
+        url = "{}/group/{}/effective_member?view=count".format(self.API,
+                                                               group_id)
 
         data = self._get_resource(url)
 
@@ -202,7 +203,9 @@ class GWS(object):
         # GWS doesn't accept EPPNs on effective member checks, for UW users
         netid = re.sub('@washington.edu', '', netid)
 
-        url = "%s/group/%s/effective_member/%s" % (self.API, group_id, netid)
+        url = "{}/group/{}/effective_member/{}".format(self.API,
+                                                       group_id,
+                                                       netid)
 
         try:
             data = self._get_resource(url)
