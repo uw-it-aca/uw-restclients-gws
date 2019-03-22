@@ -16,7 +16,7 @@ To use this client, you'll need these settings in your application or script:
     RESTCLIENTS_GWS_DAO_CLASS='Live'
 
     # Paths to UWCA cert and key files
-    RESTCLIENTS_GWS_CERT_FILE='/path/to/cert''
+    RESTCLIENTS_GWS_CERT_FILE='/path/to/cert'
     RESTCLIENTS_GWS_KEY_FILE='/path/to/key'
 
     # Groups Web Service hostname (eval or production)
