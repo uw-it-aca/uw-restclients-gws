@@ -195,6 +195,7 @@ class GroupMember(GroupEntity):
     def __init__(self, *args, **kwargs):
         super(GroupMember, self).__init__(*args, **kwargs)
 
+
 class GroupAffiliate(GWSModel):
     UWNETID_NAME = "uwnetid"
     GOOGLE_NAME = "google"
