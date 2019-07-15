@@ -22,6 +22,9 @@ class GroupReference(GWSModel):
             "url": self.url,
         }
 
+    def __init__(self, *args, **kwargs):
+        super(GroupReference, self).__init__(*args, **kwargs)
+
 
 class Group(GWSModel):
     CLASSIFICATION_NONE = "u"
@@ -48,7 +51,7 @@ class Group(GWSModel):
     dependson = models.CharField(max_length=500, null=True)
 
     def __init__(self, *args, **kwargs):
-        super(GWSModel, self).__init__(*args, **kwargs)
+        super(Group, self).__init__(*args, **kwargs)
         self.admins = []
         self.creators = []
         self.optins = []
@@ -164,6 +167,9 @@ class GroupEntity(GWSModel):
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type
 
+    def __init__(self, *args, **kwargs):
+        super(GroupEntity, self).__init__(*args, **kwargs)
+
 
 class GroupMember(GroupEntity):
     DIRECT_MTYPE = "direct"
@@ -185,6 +191,9 @@ class GroupMember(GroupEntity):
             "mtype": self.mtype,
             "source": self.source,
         }
+
+    def __init__(self, *args, **kwargs):
+        super(GroupMember, self).__init__(*args, **kwargs)
 
 
 class GroupAffiliate(GWSModel):
