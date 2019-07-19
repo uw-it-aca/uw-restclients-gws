@@ -61,16 +61,24 @@ class Group(GWSModel):
         self.affiliates = []
 
     def _to_timestamp(self, dt):
-        return int(time.mktime(dt.timetuple())*1000 + dt.microsecond/1000)
+        if dt is not None:
+            return int(time.mktime(dt.timetuple())*1000 + dt.microsecond/1000)
 
     def has_regid(self):
         return self.uwregid is not None and len(self.uwregid) == 32
 
     def json_data(self):
-        data = {
+        return {
             "id": self.name,
+            "regid": self.uwregid,
             "displayName": self.display_name,
+            "description": self.description,
+            "lastModified": self._to_timestamp(self.last_modified),
+            "lastMemberModified": self._to_timestamp(self.membership_modified),
+            "contact": self.contact,
             "authnfactor": int(self.authnfactor),
+            "classification": self.classification,
+            "dependson": self.dependson,
             "admins": [e.json_data() for e in self.admins],
             "updaters": [e.json_data() for e in self.updaters],
             "creators": [e.json_data() for e in self.creators],
@@ -79,22 +87,6 @@ class Group(GWSModel):
             "optouts": [e.json_data() for e in self.optouts],
             "affiliates": [a.json_data() for a in self.affiliates],
         }
-        if self.has_regid():
-            data["regid"] = self.uwregid
-        if self.description:
-            data["description"] = self.description
-        if self.last_modified:
-            data["lastModified"] = self._to_timestamp(self.last_modified)
-        if self.membership_modified:
-            data["lastMemberModified"] = \
-                self._to_timestamp(self.membership_modified)
-        if self.contact:
-            data["contact"] = self.contact
-        if self.classification:
-            data["classification"] = self.classification
-        if self.dependson:
-            data["dependson"] = self.dependson
-        return data
 
 
 class CourseGroup(Group):
@@ -166,13 +158,11 @@ class GroupEntity(GWSModel):
         return self.type == self.GROUP_TYPE
 
     def json_data(self):
-        data = {
+        return {
             "id": self.name,
+            "name": self.display_name,
             "type": self.type
         }
-        if self.display_name:
-            data["name"] = self.display_name
-        return data
 
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type

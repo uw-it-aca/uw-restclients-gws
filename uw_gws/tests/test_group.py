@@ -1,5 +1,5 @@
 from unittest import TestCase
-from uw_gws import GWS
+from uw_gws import GWS, get_group_json
 from uw_gws.models import (
     Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate)
 from uw_gws.utilities import fdao_gws_override
@@ -50,33 +50,37 @@ class GWSGroupTest(TestCase):
         group = Group(name="u_acadev_tester2", display_name="New ACA Tester")
         group.admins = [GroupEntity(type="uwnetid", name="acadev")]
         group.readers = [GroupEntity(type="set", name="all")]
-
-        new_group = gws._group_from_json(group.json_data())
-
-        self.assertEquals(new_group.name, group.name)
-        self.assertEquals(len(new_group.admins), 1)
-        self.assertEquals(len(new_group.readers), 1)
-        self.assertEquals(len(new_group.optins), 0)
-        self.assertEquals(new_group.json_data(),
-                          {'admins': [{'id': 'acadev', 'type': 'uwnetid'}],
-                           'affiliates': [],
-                           'authnfactor': 1,
-                           'creators': [],
-                           'displayName': 'New ACA Tester',
-                           'id': 'u_acadev_tester2',
-                           'optins': [],
-                           'optouts': [],
-                           'readers': [{'id': 'all', 'type': 'set'}],
-                           'updaters': []})
+        json_for_creat = get_group_json(group)
+        self.assertFalse('regid' in json_for_creat)
+        self.assertFalse('description' in json_for_creat)
+        self.assertFalse('lastModified' in json_for_creat)
+        self.assertFalse('lastMemberModified' in json_for_creat)
+        self.assertFalse('contact' in json_for_creat)
+        self.assertFalse('classification' in json_for_creat)
+        self.assertEquals(len(json_for_creat['admins']), 1)
+        self.assertEquals(len(json_for_creat['readers']), 1)
+        self.assertEquals(len(json_for_creat['optins']), 0)
+        self.assertEquals(len(json_for_creat['optouts']), 0)
+        self.assertEquals(len(json_for_creat['creators']), 0)
+        self.assertEquals(len(json_for_creat['updaters']), 0)
 
     def test_update_group(self):
         gws = GWS()
         group = gws.get_group_by_id("u_acadev_tester")
         group.display_name = "ACA Tester"
-
-        new_group = gws._group_from_json(group.json_data())
-
-        self.assertEquals(new_group.display_name, group.display_name)
+        json_for_upd = get_group_json(group)
+        self.assertFalse("name" in json_for_upd['admins'][0])
+        self.assertFalse("name" in json_for_upd['updaters'][0])
+        self.assertFalse("name" in json_for_upd['creators'][0])
+        self.assertFalse("name" in json_for_upd['readers'][0])
+        self.assertFalse("name" in json_for_upd['optins'][0])
+        self.assertFalse("name" in json_for_upd['optouts'][0])
+        self.assertTrue('regid' in json_for_upd)
+        self.assertTrue('description' in json_for_upd)
+        self.assertTrue('lastModified' in json_for_upd)
+        self.assertTrue('lastMemberModified' in json_for_upd)
+        self.assertTrue('contact' in json_for_upd)
+        self.assertTrue('classification' in json_for_upd)
 
     def test_delete_group(self):
         gws = GWS()

@@ -98,7 +98,7 @@ class GWS(object):
         """
         self._valid_group_id(group.id)
 
-        body = {"data": group.json_data()}
+        body = {"data": get_group_json(group)}
         url = "{}/group/{}".format(self.API, group.name)
 
         data = self._put_resource(url, headers={}, body=body)
@@ -111,7 +111,7 @@ class GWS(object):
         """
         self._valid_group_id(group.id)
 
-        body = {"data": group.json_data()}
+        body = {"data": get_group_json(group)}
         headers = {"If-Match": "*"}
         url = "{}/group/{}".format(self.API, group.name)
 
@@ -326,3 +326,46 @@ class GWS(object):
 
         if response.status != 200:
             raise DataFailureException(url, response.status, response.data)
+
+
+def get_group_json(group):
+    """
+    For create or update group request
+    """
+    data = {"id": group.name,
+            "displayName": group.display_name,
+            "authnfactor": int(group.authnfactor),
+            "admins": [get_ge_json(e) for e in group.admins],
+            "updaters": [get_ge_json(e) for e in group.updaters],
+            "creators": [get_ge_json(e) for e in group.creators],
+            "readers": [get_ge_json(e) for e in group.readers],
+            "optins": [get_ge_json(e) for e in group.optins],
+            "optouts": [get_ge_json(e) for e in group.optouts],
+            "affiliates": [a.json_data() for a in group.affiliates]}
+    if group.has_regid():
+        data["regid"] = group.uwregid
+    if group.description:
+        data["description"] = group.description
+    if group.last_modified:
+        data["lastModified"] = group._to_timestamp(group.last_modified)
+    if group.membership_modified:
+        data["lastMemberModified"] = group._to_timestamp(
+            group.membership_modified)
+    if group.contact:
+        data["contact"] = group.contact
+    if group.classification:
+        data["classification"] = group.classification
+    if group.dependson:
+        data["dependson"] = group.dependson
+    return data
+
+
+def get_ge_json(group_entity):
+    """
+    For create or update
+    """
+    d = {"id": group_entity.name,
+         "type": group_entity.type}
+    if group_entity.display_name:
+        d["name"] = group_entity.display_name
+    return d
