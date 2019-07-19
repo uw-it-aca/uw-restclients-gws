@@ -1,0 +1,41 @@
+{
+"schemas": ["urn:mace:washington.edu:schemas:groups:1.0"],
+"meta":{
+ "resourceType": "search",
+ "version": "v3.0",
+ "totalResults": 1503,
+ "searchParameters": {
+   "name": "",
+   "stem": "cal_sea",
+   "owner": ""
+ },
+ "selfRef":"https://iam-ws.u.washington.edu/group_sws/v3/search/",
+ "timestamp": 1562869284755},
+"data":[
+  { "id":"cal_sea",
+    "type":"group",
+    "regid":"baf5f1c40d6c4fbc80df6c8f2deeed5d",
+    "name":"cal_sea parent group",
+    "description":""}
+, { "id":"cal_sea_1-editor",
+    "type":"group",
+    "regid":"806cdfb7c41843b6833e5c860b0dc615",
+    "name":"Seattle Campus",
+    "description":""}
+, { "id":"cal_sea_1-showon",
+    "type":"group",
+    "regid":"a80ada89c8704425a503c99d0fe9a3c8",
+    "name":"Seattle Campus",
+    "description":""}
+, { "id":"cal_sea_111-editor",
+    "type":"group",
+    "regid":"3550bea5a83d47ccafe9a32c2a1f3db4",
+    "name":"Seattle Campus >> Seattle Academic calendar editor group",
+    "description":""}
+, { "id":"cal_sea_111-showon",
+    "type":"group",
+    "regid":"f750ed1fc1c84cf38a59e8277a96a8ec",
+    "name":"Seattle Campus >> Seattle Academic calendar showon group",
+    "description":""}
+]
+}

@@ -68,11 +68,13 @@ class GWS(object):
 
         groups = []
         for datum in data.get('data', []):
-            group = GroupReference()
-            group.uwregid = datum.get('regid')
-            group.display_name = datum.get('displayName')
-            group.name = datum.get('id')
-            group.url = datum.get('url')
+            group = GroupReference(uwregid=datum.get('regid'),
+                                   name=datum.get('id'),
+                                   url=datum.get('url'))
+            if datum.get('displayName') is not None:
+                group.display_name = datum.get('displayName')
+            else:
+                group.display_name = datum.get('name')
             groups.append(group)
 
         return groups
