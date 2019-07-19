@@ -48,8 +48,8 @@ class GWSGroupTest(TestCase):
     def test_create_group(self):
         gws = GWS()
         group = Group(name="u_acadev_tester2", display_name="New ACA Tester")
-        group.admins = [GroupEntity(type="uwnetid", id="acadev")]
-        group.readers = [GroupEntity(type="set", id="all")]
+        group.admins = [GroupEntity(type="uwnetid", name="acadev")]
+        group.readers = [GroupEntity(type="set", name="all")]
 
         new_group = gws._group_from_json(group.json_data())
 
@@ -57,6 +57,17 @@ class GWSGroupTest(TestCase):
         self.assertEquals(len(new_group.admins), 1)
         self.assertEquals(len(new_group.readers), 1)
         self.assertEquals(len(new_group.optins), 0)
+        self.assertEquals(new_group.json_data(),
+                          {'admins': [{'id': 'acadev', 'type': 'uwnetid'}],
+                           'affiliates': [],
+                           'authnfactor': 1,
+                           'creators': [],
+                           'displayName': 'New ACA Tester',
+                           'id': 'u_acadev_tester2',
+                           'optins': [],
+                           'optouts': [],
+                           'readers': [{'id': 'all', 'type': 'set'}],
+                           'updaters': []})
 
     def test_update_group(self):
         gws = GWS()
@@ -140,7 +151,7 @@ class GWSGroupTest(TestCase):
         gws = GWS()
 
         members = []
-        members.append(GroupMember(type="uwnetid", id="_"))
+        members.append(GroupMember(type="uwnetid", name="_"))
 
         bad_members = gws.update_members("u_acadev_bad_members", members)
 
@@ -193,6 +204,9 @@ class GWSGroupTest(TestCase):
 
         groups = gws.search_groups(member="javerage", type="effective")
         self.assertEquals(len(groups), 7)
+
+        groups = gws.search_groups(stem='cal_sea')
+        self.assertEquals(len(groups), 5)
 
     def test_affiliates(self):
         group = GWS().get_group_by_id('u_acadev_unittest')
