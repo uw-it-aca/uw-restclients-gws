@@ -61,8 +61,7 @@ class Group(GWSModel):
         self.affiliates = []
 
     def _to_timestamp(self, dt):
-        if dt is not None:
-            return int(time.mktime(dt.timetuple())*1000 + dt.microsecond/1000)
+        return int(time.mktime(dt.timetuple())*1000 + dt.microsecond/1000)
 
     def has_regid(self):
         return self.uwregid is not None and len(self.uwregid) == 32
@@ -80,7 +79,7 @@ class Group(GWSModel):
             "optouts": [e.json_data() for e in self.optouts],
             "affiliates": [a.json_data() for a in self.affiliates],
         }
-        if self.uwregid:
+        if self.has_regid():
             data["regid"] = self.uwregid
         if self.description:
             data["description"] = self.description
