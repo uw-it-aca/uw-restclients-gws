@@ -50,6 +50,17 @@ class GWSGroupTest(TestCase):
         group = Group(name="u_acadev_tester2", display_name="New ACA Tester")
         group.admins = [GroupEntity(type="uwnetid", name="acadev")]
         group.readers = [GroupEntity(type="set", name="all")]
+        json_data = group.json_data()
+        self.assertTrue('regid' in json_data)
+        self.assertTrue('description' in json_data)
+        self.assertTrue('lastModified' in json_data)
+        self.assertTrue('lastMemberModified' in json_data)
+        self.assertTrue('contact' in json_data)
+        self.assertTrue('classification' in json_data)
+        self.assertTrue('name' in json_data['admins'][0])
+        group1 = gws._group_from_json(json_data)
+        self.assertEquals(group1.name, group.name)
+
         json_for_creat = get_group_json(group)
         self.assertFalse('regid' in json_for_creat)
         self.assertFalse('description' in json_for_creat)
