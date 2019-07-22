@@ -1,5 +1,5 @@
 from unittest import TestCase
-from uw_gws import GWS, get_group_json
+from uw_gws import GWS, get_group_json, del_none_value
 from uw_gws.models import (
     Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate)
 from uw_gws.utilities import fdao_gws_override
@@ -60,6 +60,10 @@ class GWSGroupTest(TestCase):
         self.assertTrue('name' in json_data['admins'][0])
         group1 = gws._group_from_json(json_data)
         self.assertEquals(group1.name, group.name)
+
+        self.assertEquals(del_none_value(
+            [{'id': 'all', 'name': None, 'type': 'set'}]),
+            [{'id': 'all', 'type': 'set'}])
 
         json_for_creat = get_group_json(group)
         self.assertFalse('regid' in json_for_creat)
