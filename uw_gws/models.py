@@ -67,8 +67,8 @@ class Group(GWSModel):
     def has_regid(self):
         return self.uwregid is not None and len(self.uwregid) == 32
 
-    def json_data(self):
-        return {
+    def json_data(self, is_put_req=False):
+        data = {
             "id": self.name,
             "regid": self.uwregid,
             "displayName": self.display_name,
@@ -79,14 +79,23 @@ class Group(GWSModel):
             "authnfactor": int(self.authnfactor),
             "classification": self.classification,
             "dependson": self.dependson,
-            "admins": [e.json_data() for e in self.admins],
-            "updaters": [e.json_data() for e in self.updaters],
-            "creators": [e.json_data() for e in self.creators],
-            "readers": [e.json_data() for e in self.readers],
-            "optins": [e.json_data() for e in self.optins],
-            "optouts": [e.json_data() for e in self.optouts],
+            "admins": [e.json_data(is_put_req=is_put_req)
+                       for e in self.admins],
+            "updaters": [e.json_data(is_put_req=is_put_req)
+                         for e in self.updaters],
+            "creators": [e.json_data(is_put_req=is_put_req)
+                         for e in self.creators],
+            "readers": [e.json_data(is_put_req=is_put_req)
+                        for e in self.readers],
+            "optins": [e.json_data(is_put_req=is_put_req)
+                       for e in self.optins],
+            "optouts": [e.json_data(is_put_req=is_put_req)
+                        for e in self.optouts],
             "affiliates": [a.json_data() for a in self.affiliates],
         }
+        if is_put_req is False:
+            return data
+        return {k: v for k, v in data.items() if v is not None and v != ''}
 
 
 class CourseGroup(Group):
@@ -157,12 +166,12 @@ class GroupEntity(GWSModel):
     def is_group(self):
         return self.type == self.GROUP_TYPE
 
-    def json_data(self):
-        return {
-            "id": self.name,
-            "name": self.display_name,
-            "type": self.type
-        }
+    def json_data(self, is_put_req=False):
+        data = {"id": self.name,
+                "type": self.type}
+        if is_put_req is False:
+            data["name"] = self.display_name
+        return data
 
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type
@@ -184,13 +193,13 @@ class GroupMember(GroupEntity):
         max_length=10, choices=MTYPE_CHOICES, default=DIRECT_MTYPE)
     source = models.CharField(max_length=1000, null=True)
 
-    def json_data(self):
-        return {
-            "id": self.name,
-            "type": self.type,
-            "mtype": self.mtype,
-            "source": self.source,
-        }
+    def json_data(self, is_put_req=False):
+        data = {"id": self.name,
+                "type": self.type}
+        if is_put_req is False:
+            data["mtype"] = self.mtype
+            data["source"] = self.source
+        return data
 
     def __init__(self, *args, **kwargs):
         super(GroupMember, self).__init__(*args, **kwargs)

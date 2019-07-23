@@ -100,7 +100,7 @@ class GWS(object):
         """
         self._valid_group_id(group.id)
 
-        body = {"data": get_group_json(group)}
+        body = {"data": group.json_data(is_put_req=True)}
         url = "{}/group/{}".format(self.API, group.name)
 
         data = self._put_resource(url, headers={}, body=body)
@@ -113,7 +113,7 @@ class GWS(object):
         """
         self._valid_group_id(group.id)
 
-        body = {"data": get_group_json(group)}
+        body = {"data": group.json_data(is_put_req=True)}
         headers = {"If-Match": "*"}
         url = "{}/group/{}".format(self.API, group.name)
 
@@ -156,7 +156,7 @@ class GWS(object):
         """
         self._valid_group_id(group_id)
 
-        body = {"data": [m.json_data() for m in members]}
+        body = {"data": [m.json_data(is_put_req=True) for m in members]}
         headers = {"If-Match": "*"}
         url = "{}/group/{}/member".format(self.API, group_id)
 
@@ -334,18 +334,3 @@ class GWS(object):
             logger.error("{0} ==> status:{1} data:{2}".format(
                 url, response.status, response.data))
             raise DataFailureException(url, response.status, response.data)
-
-
-def get_group_json(group):
-    """
-    For create or update group request, leave out the None valued fields
-    """
-    return {k: del_none_value(v)
-            for k, v in group.json_data().items()
-            if v is not None and v != ''}
-
-
-def del_none_value(json_value):
-    if type(json_value) is not list:
-        return json_value
-    return [{k: v for k, v in e.items() if v is not None} for e in json_value]

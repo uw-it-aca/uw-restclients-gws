@@ -1,5 +1,5 @@
 from unittest import TestCase
-from uw_gws import GWS, get_group_json, del_none_value
+from uw_gws import GWS
 from uw_gws.models import (
     Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate)
 from uw_gws.utilities import fdao_gws_override
@@ -61,11 +61,7 @@ class GWSGroupTest(TestCase):
         group1 = gws._group_from_json(json_data)
         self.assertEquals(group1.name, group.name)
 
-        self.assertEquals(del_none_value(
-            [{'id': 'all', 'name': None, 'type': 'set'}]),
-            [{'id': 'all', 'type': 'set'}])
-
-        json_for_creat = get_group_json(group)
+        json_for_creat = group.json_data(is_put_req=True)
         self.assertFalse('regid' in json_for_creat)
         self.assertFalse('description' in json_for_creat)
         self.assertFalse('lastModified' in json_for_creat)
@@ -83,7 +79,7 @@ class GWSGroupTest(TestCase):
         gws = GWS()
         group = gws.get_group_by_id("u_acadev_tester")
         group.display_name = "ACA Tester"
-        json_for_upd = get_group_json(group)
+        json_for_upd = group.json_data(is_put_req=True)
         self.assertFalse("name" in json_for_upd['admins'][0])
         self.assertFalse("name" in json_for_upd['updaters'][0])
         self.assertFalse("name" in json_for_upd['creators'][0])
@@ -145,8 +141,7 @@ class GWSGroupTest(TestCase):
         mock_put.assert_called_with(
             '/group_sws/v3/group/u_acadev_unittest/member',
             {'If-Match': '*'},
-            {'data': [{'mtype': 'direct', 'source': None,
-                       'type': 'uwnetid', 'id': 'javerage'}]})
+            {'data': [{'type': 'uwnetid', 'id': 'javerage'}]})
 
         members.append(GroupMember(type="uwnetid", name="seven"))
         members.append(GroupMember(type="uwnetid", name="eight"))
@@ -157,14 +152,10 @@ class GWSGroupTest(TestCase):
         mock_put.assert_called_with(
             '/group_sws/v3/group/u_acadev_unittest/member',
             {'If-Match': '*'},
-            {'data': [{'mtype': 'direct', 'source': None,
-                       'type': 'uwnetid', 'id': 'javerage'},
-                      {'mtype': 'direct', 'source': None,
-                       'type': 'uwnetid', 'id': 'seven'},
-                      {'mtype': 'direct', 'source': None,
-                       'type': 'uwnetid', 'id': 'eight'},
-                      {'mtype': 'direct', 'source': None,
-                       'type': 'uwnetid', 'id': 'nine'}]})
+            {'data': [{'type': 'uwnetid', 'id': 'javerage'},
+                      {'type': 'uwnetid', 'id': 'seven'},
+                      {'type': 'uwnetid', 'id': 'eight'},
+                      {'type': 'uwnetid', 'id': 'nine'}]})
 
     def test_update_members_notfound(self):
         gws = GWS()
