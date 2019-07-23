@@ -98,7 +98,7 @@ class GWS(object):
         """
         Creates a group from the passed restclients.Group object.
         """
-        self._valid_group_id(group.id)
+        self._valid_group_id(group.name)
 
         body = {"data": group.json_data(is_put_req=True)}
         url = "{}/group/{}".format(self.API, group.name)
@@ -111,7 +111,7 @@ class GWS(object):
         """
         Updates a group from the passed restclients.Group object.
         """
-        self._valid_group_id(group.id)
+        self._valid_group_id(group.name)
 
         body = {"data": group.json_data(is_put_req=True)}
         headers = {"If-Match": "*"}

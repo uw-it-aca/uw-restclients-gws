@@ -1,4 +1,5 @@
 from unittest import TestCase
+from restclients_core.exceptions import DataFailureException
 from uw_gws import GWS
 from uw_gws.models import (
     Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate)
@@ -44,6 +45,7 @@ class GWSGroupTest(TestCase):
         self.assertEquals(group.year, 2012)
         self.assertEquals(group.quarter, "autumn")
         self.assertEquals(len(group.instructors), 11)
+        self.assertIsNotNone(group.json_data())
 
     def test_create_group(self):
         gws = GWS()
@@ -75,10 +77,13 @@ class GWSGroupTest(TestCase):
         self.assertEquals(len(json_for_creat['creators']), 0)
         self.assertEquals(len(json_for_creat['updaters']), 0)
 
+        self.assertRaises(DataFailureException, gws.create_group, group)
+
     def test_update_group(self):
         gws = GWS()
         group = gws.get_group_by_id("u_acadev_tester")
         group.display_name = "ACA Tester"
+        self.assertTrue(group.has_regid())
         json_for_upd = group.json_data(is_put_req=True)
         self.assertFalse("name" in json_for_upd['admins'][0])
         self.assertFalse("name" in json_for_upd['updaters'][0])
@@ -93,6 +98,9 @@ class GWSGroupTest(TestCase):
         self.assertTrue('contact' in json_for_upd)
         self.assertTrue('classification' in json_for_upd)
 
+        group1 = gws.update_group(group)
+        self.assertIsNotNone(group1)
+
     def test_delete_group(self):
         gws = GWS()
         group = Group(name='u_acadev_tester')
@@ -100,9 +108,18 @@ class GWSGroupTest(TestCase):
         self.assertEquals(result, True)
 
     def test_group_member(self):
-        member1 = GroupMember(type="uwnetid", name="javerage")
+        member1 = GroupMember(type="uwnetid",
+                              name="javerage",
+                              mtype="direct")
         self.assertEquals(member1.is_uwnetid(), True)
-
+        self.assertEquals(member1.json_data(),
+                          {"type": "uwnetid",
+                           "mtype": "direct",
+                           "source": None,
+                           "id": "javerage"})
+        self.assertEquals(member1.json_data(is_put_req=True),
+                          {"type": "uwnetid",
+                           "id": "javerage"})
         member2 = GroupMember(type="uwnetid", name="javerage")
         self.assertEquals(member2.type, "uwnetid")
         self.assertEquals(member2.name, "javerage")
@@ -217,6 +234,12 @@ class GWSGroupTest(TestCase):
 
         groups = gws.search_groups(stem='cal_sea')
         self.assertEquals(len(groups), 5)
+        self.assertEqual(groups[0].json_data(),
+                         {'displayName': 'cal_sea parent group',
+                          'id': 'cal_sea',
+                          'regid': 'baf5f1c40d6c4fbc80df6c8f2deeed5d',
+                          'url': None})
+        self.assertIsNotNone(str(groups[0]))
 
     def test_affiliates(self):
         group = GWS().get_group_by_id('u_acadev_unittest')
