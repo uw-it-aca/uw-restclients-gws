@@ -3,7 +3,9 @@ This is the interface for interacting with the Group Web Service.
 """
 
 from datetime import datetime
+from copy import deepcopy
 import json
+import logging
 import re
 from urllib.parse import urlencode
 from restclients_core.exceptions import DataFailureException
@@ -13,8 +15,7 @@ from uw_gws.models import (
     GroupAffiliate)
 from uw_gws.exceptions import InvalidGroupID
 
-
-DAO = GWS_DAO()
+logger = logging.getLogger(__name__)
 
 
 class GWS(object):
@@ -26,6 +27,7 @@ class GWS(object):
     RE_GROUP_ID = re.compile(r'^[a-z0-9][\w\.-]+$', re.I)
 
     def __init__(self, config={}):
+        self.DAO = GWS_DAO()
         self.actas = config['actas'] if 'actas' in config else None
 
     def search_groups(self, **kwargs):
@@ -96,9 +98,9 @@ class GWS(object):
         """
         Creates a group from the passed restclients.Group object.
         """
-        self._valid_group_id(group.id)
+        self._valid_group_id(group.name)
 
-        body = {"data": group.json_data()}
+        body = {"data": group.json_data(is_put_req=True)}
         url = "{}/group/{}".format(self.API, group.name)
 
         data = self._put_resource(url, headers={}, body=body)
@@ -109,9 +111,9 @@ class GWS(object):
         """
         Updates a group from the passed restclients.Group object.
         """
-        self._valid_group_id(group.id)
+        self._valid_group_id(group.name)
 
-        body = {"data": group.json_data()}
+        body = {"data": group.json_data(is_put_req=True)}
         headers = {"If-Match": "*"}
         url = "{}/group/{}".format(self.API, group.name)
 
@@ -154,7 +156,7 @@ class GWS(object):
         """
         self._valid_group_id(group_id)
 
-        body = {"data": [m.json_data() for m in members]}
+        body = {"data": [m.json_data(is_put_req=True) for m in members]}
         headers = {"If-Match": "*"}
         url = "{}/group/{}/member".format(self.API, group_id)
 
@@ -298,9 +300,11 @@ class GWS(object):
         if self.actas:
             headers["X-UW-Act-as"] = self.actas
 
-        response = DAO.getURL(url, headers)
+        response = self.DAO.getURL(url, headers)
 
         if response.status != 200:
+            logger.error("{0} ==> status:{1} data:{2}".format(
+                url, response.status, response.data))
             raise DataFailureException(url, response.status, response.data)
 
         return json.loads(response.data)
@@ -311,9 +315,11 @@ class GWS(object):
         if self.actas:
             headers["X-UW-Act-as"] = self.actas
 
-        response = DAO.putURL(url, headers, json.dumps(body))
+        response = self.DAO.putURL(url, headers, json.dumps(body))
 
         if response.status != 200:
+            logger.error("{0} {1} ==> status:{2} data:{3}".format(
+                url, body, response.status, response.data))
             raise DataFailureException(url, response.status, response.data)
 
         return json.loads(response.data)
@@ -322,7 +328,9 @@ class GWS(object):
         if self.actas:
             headers["X-UW-Act-as"] = self.actas
 
-        response = DAO.deleteURL(url, headers)
+        response = self.DAO.deleteURL(url, headers)
 
         if response.status != 200:
+            logger.error("{0} ==> status:{1} data:{2}".format(
+                url, response.status, response.data))
             raise DataFailureException(url, response.status, response.data)
