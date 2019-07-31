@@ -317,7 +317,7 @@ class GWS(object):
 
         response = self.DAO.putURL(url, headers, json.dumps(body))
 
-        if response.status != 200:
+        if response.status != 200 and response.status != 201:
             logger.error("{0} {1} ==> status:{2} data:{3}".format(
                 url, body, response.status, response.data))
             raise DataFailureException(url, response.status, response.data)
