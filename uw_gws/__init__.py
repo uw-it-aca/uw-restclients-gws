@@ -218,6 +218,7 @@ class GWS(object):
         elif response.status == 404:
             return False
         else:
+            self._log_error(url, response)
             raise DataFailureException(url, response.status, response.data)
 
     def _group_entity_from_json(self, data):
@@ -299,8 +300,7 @@ class GWS(object):
         response = self.DAO.getURL(url, self._headers())
 
         if response.status != 200:
-            logger.error("{0} ==> status:{1} data:{2}".format(
-                url, response.status, response.data))
+            self._log_error(url, response)
             raise DataFailureException(url, response.status, response.data)
 
         return json.loads(response.data)
@@ -312,8 +312,7 @@ class GWS(object):
         response = self.DAO.putURL(url, headers, json.dumps(body))
 
         if response.status != 200 and response.status != 201:
-            logger.error("{0} {1} ==> status:{2} data:{3}".format(
-                url, body, response.status, response.data))
+            self._log_error(url, response)
             raise DataFailureException(url, response.status, response.data)
 
         return json.loads(response.data)
@@ -322,8 +321,7 @@ class GWS(object):
         response = self.DAO.deleteURL(url, self._headers())
 
         if response.status != 200:
-            logger.error("{0} ==> status:{1} data:{2}".format(
-                url, response.status, response.data))
+            self._log_error(url, response)
             raise DataFailureException(url, response.status, response.data)
 
     def _headers(self):
@@ -333,3 +331,7 @@ class GWS(object):
             headers["X-UW-Act-as"] = self.actas
 
         return headers
+
+    def _log_error(self, url, response):
+        logger.error("{0} ==> status:{1} data:{2}".format(
+            url, response.status, response.data))
