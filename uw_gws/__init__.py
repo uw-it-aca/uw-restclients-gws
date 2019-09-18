@@ -211,14 +211,16 @@ class GWS(object):
                                                        group_id,
                                                        netid)
 
-        try:
-            data = self._get_resource(url)
-            return True  # 200
-        except DataFailureException as ex:
-            if ex.status == 404:
-                return False
-            else:
-                raise
+        # Not using _get_resource() here because it automatically logs 404s
+        response = self.DAO.getURL(url, self._headers())
+
+        if response.status == 200:
+            return True
+        elif response.status == 404:
+            return False
+        else:
+            self._log_error(url, response)
+            raise DataFailureException(url, response.status, response.data)
 
     def _group_entity_from_json(self, data):
         return GroupEntity(name=data.get('id'),
@@ -295,42 +297,42 @@ class GWS(object):
         if (group_id is None or not self.RE_GROUP_ID.match(group_id)):
             raise InvalidGroupID(group_id)
 
-    def _get_resource(self, url, headers={}):
-        headers["Accept"] = "application/json"
-        if self.actas:
-            headers["X-UW-Act-as"] = self.actas
-
-        response = self.DAO.getURL(url, headers)
+    def _get_resource(self, url):
+        response = self.DAO.getURL(url, self._headers())
 
         if response.status != 200:
-            logger.error("{0} ==> status:{1} data:{2}".format(
-                url, response.status, response.data))
+            self._log_error(url, response)
             raise DataFailureException(url, response.status, response.data)
 
         return json.loads(response.data)
 
-    def _put_resource(self, url, headers={}, body={}):
-        headers["Accept"] = "application/json"
+    def _put_resource(self, url, headers, body={}):
         headers["Content-Type"] = "application/json"
-        if self.actas:
-            headers["X-UW-Act-as"] = self.actas
+        headers.update(self._headers())
 
         response = self.DAO.putURL(url, headers, json.dumps(body))
 
         if response.status != 200 and response.status != 201:
-            logger.error("{0} {1} ==> status:{2} data:{3}".format(
-                url, body, response.status, response.data))
+            self._log_error(url, response)
             raise DataFailureException(url, response.status, response.data)
 
         return json.loads(response.data)
 
-    def _delete_resource(self, url, headers={}):
+    def _delete_resource(self, url):
+        response = self.DAO.deleteURL(url, self._headers())
+
+        if response.status != 200:
+            self._log_error(url, response)
+            raise DataFailureException(url, response.status, response.data)
+
+    def _headers(self):
+        headers = {"Accept": "application/json"}
+
         if self.actas:
             headers["X-UW-Act-as"] = self.actas
 
-        response = self.DAO.deleteURL(url, headers)
+        return headers
 
-        if response.status != 200:
-            logger.error("{0} ==> status:{1} data:{2}".format(
-                url, response.status, response.data))
-            raise DataFailureException(url, response.status, response.data)
+    def _log_error(self, url, response):
+        logger.error("{0} ==> status:{1} data:{2}".format(
+            url, response.status, response.data))
