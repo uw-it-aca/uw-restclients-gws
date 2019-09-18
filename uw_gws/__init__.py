@@ -211,6 +211,7 @@ class GWS(object):
                                                        group_id,
                                                        netid)
 
+        # Not using _get_resource() here because it automatically logs 404s
         response = self.DAO.getURL(url, self._headers())
 
         if response.status == 200:
