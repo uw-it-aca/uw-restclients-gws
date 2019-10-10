@@ -149,6 +149,19 @@ class GWS(object):
             members.append(self._group_member_from_json(datum))
         return members
 
+    def delete_members(self, group_id, members):
+        """
+        Deletes members from the group identified by group_id
+        :param members: a non-empty list of uwnetids
+        """
+        self._valid_group_id(group_id)
+
+        url = "{}/group/{}/{}".format(self.API, group_id, ",".join(members))
+
+        self._delete_resource(url)
+
+        return True
+
     def update_members(self, group_id, members):
         """
         Updates the membership of the group represented by the passed group id.
