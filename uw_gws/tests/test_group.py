@@ -11,6 +11,14 @@ import mock
 
 @fdao_gws_override
 class GWSGroupTest(TestCase):
+    def test_request_headers(self):
+        gws = GWS()
+        self.assertEquals(gws._headers(), {'Accept': 'application/json'})
+
+        gws = GWS(config={'actas': 'javerage'})
+        self.assertEquals(gws._headers(), {'Accept': 'application/json',
+                                           'X-UW-Act-as': 'javerage'})
+
     def test_get_nonexistent_group(self):
         gws = GWS()
         self.assertRaises(DataFailureException,
