@@ -112,8 +112,7 @@ class GWSGroupTest(TestCase):
     def test_delete_group(self):
         gws = GWS()
         group = Group(name='u_acadev_tester')
-        result = gws.delete_group(group.name)
-        self.assertEquals(result, True)
+        self.assertTrue(gws.delete_group(group.name))
 
     def test_group_member(self):
         member1 = GroupMember(type="uwnetid",
@@ -151,6 +150,13 @@ class GWSGroupTest(TestCase):
         self.assertIn(GroupMember(type="uwnetid", name="eight"), members)
         self.assertNotIn(GroupMember(type="eppn", name="j@washington.edu"),
                          members)
+
+    def test_delete_members(self):
+        gws = GWS()
+        self.assertTrue(gws.delete_members(
+            'u_acadev_unittest', ['eight', 'seven']))
+        self.assertTrue(gws.delete_members(
+            'u_acadev_unittest', ['seven']))
 
     @mock.patch.object(GWS, '_put_resource')
     def test_update_members(self, mock_put):
