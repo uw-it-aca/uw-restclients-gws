@@ -156,7 +156,8 @@ class GWS(object):
         """
         self._valid_group_id(group_id)
 
-        url = "{}/group/{}/{}".format(self.API, group_id, ",".join(members))
+        url = "{}/group/{}/member/{}".format(
+            self.API, group_id, ",".join(members))
 
         self._delete_resource(url)
 
