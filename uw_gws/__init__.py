@@ -149,6 +149,21 @@ class GWS(object):
             members.append(self._group_member_from_json(datum))
         return members
 
+    def add_members(self, group_id, members):
+        """
+        Adds members into the group identified by group_id
+        :param members: a non-empty list of uwnetids
+        """
+        self._valid_group_id(group_id)
+
+        headers = {"If-Match": "*"}
+        url = "{}/group/{}/member/{}".format(
+            self.API, group_id, ",".join(members))
+
+        self._put_resource(url, headers)
+
+        return True
+
     def delete_members(self, group_id, members):
         """
         Deletes members from the group identified by group_id
@@ -338,6 +353,8 @@ class GWS(object):
         if response.status != 200:
             self._log_error(url, response)
             raise DataFailureException(url, response.status, response.data)
+
+        return json.loads(response.data)
 
     def _headers(self):
         headers = {"Accept": "application/json"}

@@ -151,12 +151,23 @@ class GWSGroupTest(TestCase):
         self.assertNotIn(GroupMember(type="eppn", name="j@washington.edu"),
                          members)
 
+    def test_add_members(self):
+        gws = GWS()
+        self.assertTrue(gws.add_members(
+            'u_acadev_unittest', ['seven']))
+
+        self.assertRaises(DataFailureException,
+                          gws.add_members,
+                          'u_acadev_err', ['seven'])
+
     def test_delete_members(self):
         gws = GWS()
         self.assertTrue(gws.delete_members(
             'u_acadev_unittest', ['eight', 'seven']))
-        self.assertTrue(gws.delete_members(
-            'u_acadev_unittest', ['seven']))
+
+        self.assertRaises(DataFailureException,
+                          gws.delete_members,
+                          'u_acadev_err', ['seven'])
 
     @mock.patch.object(GWS, '_put_resource')
     def test_update_members(self, mock_put):
