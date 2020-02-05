@@ -22,8 +22,7 @@ setup(
     author="UW-IT AXDD",
     author_email="aca-it@uw.edu",
     include_package_data=True,
-    install_requires=['UW-RestClients-Core>1.3.2,<2.0',
-                      'mock'],
+    install_requires=['UW-RestClients-Core>=1.3.2,<2.0'],
     license='Apache License, Version 2.0',
     description=('A library for connecting to the Groups Web Service at the '
                  'University of Washington'),
