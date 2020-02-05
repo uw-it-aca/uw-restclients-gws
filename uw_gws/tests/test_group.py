@@ -11,11 +11,18 @@ import mock
 
 @fdao_gws_override
 class GWSGroupTest(TestCase):
+    def test_init(self):
+        gws = GWS()
+        self.assertIsNone(gws.logger)
+
+        gws = GWS(log_errors=True)
+        self.assertIsNotNone(gws.logger)
+
     def test_request_headers(self):
         gws = GWS()
         self.assertEquals(gws._headers(), {'Accept': 'application/json'})
 
-        gws = GWS(config={'actas': 'javerage'})
+        gws = GWS(act_as='javerage')
         self.assertEquals(gws._headers(), {'Accept': 'application/json',
                                            'X-UW-Act-as': 'javerage'})
 
