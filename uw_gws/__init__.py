@@ -15,8 +15,6 @@ from uw_gws.models import (
     GroupAffiliate)
 from uw_gws.exceptions import InvalidGroupID
 
-logger = logging.getLogger(__name__)
-
 
 class GWS(object):
     """
@@ -26,9 +24,10 @@ class GWS(object):
     QTRS = {'win': 'winter', 'spr': 'spring', 'sum': 'summer', 'aut': 'autumn'}
     RE_GROUP_ID = re.compile(r'^[a-z0-9][\w\.-]+$', re.I)
 
-    def __init__(self, config={}):
+    def __init__(self, act_as=None, log_errors=False):
         self.DAO = GWS_DAO()
-        self.actas = config['actas'] if 'actas' in config else None
+        self.act_as = act_as
+        self.logger = logging.getLogger(__name__) if log_errors else None
 
     def search_groups(self, **kwargs):
         """
@@ -359,11 +358,13 @@ class GWS(object):
     def _headers(self):
         headers = {"Accept": "application/json"}
 
-        if self.actas:
-            headers["X-UW-Act-as"] = self.actas
+        if self.act_as:
+            headers["X-UW-Act-as"] = self.act_as
 
         return headers
 
     def _log_error(self, url, response):
-        logger.error("{0} ==> status:{1} data:{2}".format(
-            url, response.status, response.data))
+        if self.logger:
+            self.logger.error(
+                "url: {0}, status: {1}, data: {2}, act_as: {3}".format(
+                    url, response.status, response.data, self.act_as))
