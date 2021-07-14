@@ -1,0 +1,27 @@
+{
+    "schemas": [
+        "urn:mace:washington.edu:schemas:groups:1.0"
+    ],
+    "meta": {
+        "resourceType": "history",
+        "version": "v3.0",
+        "lastModified": "1313239708377",
+        "selfRef": "https://groups.uw.edu/group_sws/v3/group/u_acadev_tester/history/"
+    },
+    "data": [
+      { 
+        "timestamp":1626215049643,
+        "user":"iam-tools-irws-watcher.cac.washington.edu",
+        "actAs":"",
+        "activity":"membership",
+        "description":"add member: 'five'"
+      },
+      {
+        "timestamp":1626193233239,
+        "user":"iam-tools-irws-watcher.cac.washington.edu",
+        "actAs":"",
+        "activity":"membership",
+        "description":"delete member: 'eight'"
+      }
+    ]
+}

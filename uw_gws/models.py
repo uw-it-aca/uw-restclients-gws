@@ -4,8 +4,6 @@
 from restclients_core import models
 import json
 import time
-from datetime import datetime
-from pytz import timezone
 
 
 class GWSModel(models.Model):

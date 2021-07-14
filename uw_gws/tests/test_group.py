@@ -341,14 +341,12 @@ class GWSGroupTest(TestCase):
              "action": "delete member",
              "timestamp": 1626193233239,
              "is_add_member": False,
-             "is_delete_member": True
-            })
+             "is_delete_member": True})
         self.assertEquals(
             changes[1].json_data(),
             {"uwnetid": "five",
              "action": "add member",
              "timestamp": 1626215049643,
              "is_add_member": True,
-             "is_delete_member": False
-             })
+             "is_delete_member": False})
         self.assertIsNotNone(changes[1])
