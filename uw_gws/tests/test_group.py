@@ -7,7 +7,8 @@ from pytz import timezone
 from restclients_core.exceptions import DataFailureException
 from uw_gws import GWS
 from uw_gws.models import (
-    Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate)
+    Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate,
+    GroupMembershipUpdate)
 from uw_gws.utilities import fdao_gws_override
 from uw_gws.exceptions import InvalidGroupID
 from restclients_core.exceptions import DataFailureException
@@ -350,3 +351,8 @@ class GWSGroupTest(TestCase):
              "is_add_member": True,
              "is_delete_member": False})
         self.assertIsNotNone(changes[1])
+
+        mup = GroupMembershipUpdate(
+            uwnetid="five", action="add member",
+            timestamp=162621504964)
+        self.assertTrue(mup.is_add_member())
