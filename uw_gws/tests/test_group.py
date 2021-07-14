@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from unittest import TestCase
+from datetime import datetime
+from pytz import timezone
 from restclients_core.exceptions import DataFailureException
 from uw_gws import GWS
 from uw_gws.models import (
@@ -326,3 +328,27 @@ class GWSGroupTest(TestCase):
         self.assertIn(
             GroupEntity(name="all", type=GroupEntity.SET_TYPE),
             group.optouts)
+
+    def test_get_membership_history(self):
+        changes = GWS().get_membership_history(
+            'u_acadev_tester',
+            int(datetime(2021, 7, 13, 15, 30, 00,
+                tzinfo=timezone("US/Pacific")).timestamp()))
+        self.assertEqual(len(changes), 2)
+        self.assertEquals(
+            changes[0].json_data(),
+            {"uwnetid": "eight",
+             "action": "delete member",
+             "timestamp": 1626193233239,
+             "is_add_member": False,
+             "is_delete_member": True
+            })
+        self.assertEquals(
+            changes[1].json_data(),
+            {"uwnetid": "five",
+             "action": "add member",
+             "timestamp": 1626215049643,
+             "is_add_member": True,
+             "is_delete_member": False
+             })
+        self.assertIsNotNone(changes[1])

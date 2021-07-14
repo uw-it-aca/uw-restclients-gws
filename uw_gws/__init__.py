@@ -15,7 +15,7 @@ from restclients_core.exceptions import DataFailureException
 from uw_gws.dao import GWS_DAO
 from uw_gws.models import (
     Group, CourseGroup, GroupReference, GroupEntity, GroupMember,
-    GroupAffiliate)
+    GroupAffiliate, GroupMembershipUpdate)
 from uw_gws.exceptions import InvalidGroupID
 
 
@@ -197,6 +197,22 @@ class GWS(object):
         if len(errors):
             return errors[0].get("notFound", [])
         return []
+
+    def get_membership_history(self, group_id, start_time):
+        """
+        Returns a list of GroupMembershipUpdate objects, in the order of
+        from the earliest to the latest.
+        start_time: POSIX timestamp in seconds
+        """
+        self._valid_group_id(group_id)
+        url = "{}/group/{}/history?start={}".format(
+            self.API, group_id, start_time * 1000)
+        data = self._get_resource(url)
+        changes = []
+        for datum in data.get("data"):
+            if datum.get("activity") == "membership":
+                changes.insert(0, GroupMembershipUpdate(data=datum))
+        return changes
 
     def get_effective_members(self, group_id):
         """
