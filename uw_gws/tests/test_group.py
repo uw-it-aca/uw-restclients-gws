@@ -1,9 +1,9 @@
 # Copyright 2021 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
-from unittest import TestCase
 from datetime import datetime
 from pytz import timezone
+from unittest import TestCase
 from restclients_core.exceptions import DataFailureException
 from uw_gws import GWS
 from uw_gws.models import (
@@ -331,10 +331,9 @@ class GWSGroupTest(TestCase):
             group.optouts)
 
     def test_get_membership_history(self):
-        changes = GWS().get_membership_history(
-            'u_acadev_tester',
-            int(datetime(2021, 7, 13, 15, 30, 00,
-                tzinfo=timezone("US/Pacific")).timestamp()))
+        d = int(timezone("US/Pacific").localize(
+            datetime(2021, 7, 13, 15, 30, 00)).timestamp())
+        changes = GWS().get_membership_history('u_acadev_tester', d)
         self.assertEqual(len(changes), 2)
         self.assertEquals(
             changes[0].json_data(),

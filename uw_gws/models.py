@@ -253,6 +253,7 @@ class GroupMembershipUpdate(GWSModel):
     uwnetid = models.CharField(max_length=128)
     action = models.CharField(max_length=32)
     timestamp = models.IntegerField()
+    # Epoch timestamp in milliseconds
 
     def is_add_member(self):
         return self.action == "add member"
@@ -276,4 +277,3 @@ class GroupMembershipUpdate(GWSModel):
         self.action, name = data.get("description").split(": ")
         self.uwnetid = name.replace("'", "")
         self.timestamp = int(data.get("timestamp"))
-        # in milliseconds

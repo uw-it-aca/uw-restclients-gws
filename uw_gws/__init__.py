@@ -202,7 +202,7 @@ class GWS(object):
         """
         Returns a list of GroupMembershipUpdate objects, in the order of
         from the earliest to the latest.
-        start_time: POSIX timestamp in seconds
+        start_time: Epoch timestamp in seconds
         """
         self._valid_group_id(group_id)
         url = "{}/group/{}/history?start={}".format(
