@@ -1,11 +1,14 @@
 # Copyright 2021 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
+from datetime import datetime
+from pytz import timezone
 from unittest import TestCase
 from restclients_core.exceptions import DataFailureException
 from uw_gws import GWS
 from uw_gws.models import (
-    Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate)
+    Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate,
+    GroupMembershipUpdate)
 from uw_gws.utilities import fdao_gws_override
 from uw_gws.exceptions import InvalidGroupID
 from restclients_core.exceptions import DataFailureException
@@ -326,3 +329,29 @@ class GWSGroupTest(TestCase):
         self.assertIn(
             GroupEntity(name="all", type=GroupEntity.SET_TYPE),
             group.optouts)
+
+    def test_get_membership_history(self):
+        d = int(timezone("US/Pacific").localize(
+            datetime(2021, 7, 13, 15, 30, 00)).timestamp())
+        changes = GWS().get_membership_history('u_acadev_tester', d)
+        self.assertEqual(len(changes), 2)
+        self.assertEquals(
+            changes[0].json_data(),
+            {"uwnetid": "eight",
+             "action": "delete member",
+             "timestamp": 1626193233239,
+             "is_add_member": False,
+             "is_delete_member": True})
+        self.assertEquals(
+            changes[1].json_data(),
+            {"uwnetid": "five",
+             "action": "add member",
+             "timestamp": 1626215049643,
+             "is_add_member": True,
+             "is_delete_member": False})
+        self.assertIsNotNone(changes[1])
+
+        mup = GroupMembershipUpdate(
+            uwnetid="five", action="add member",
+            timestamp=162621504964)
+        self.assertTrue(mup.is_add_member())

@@ -247,3 +247,33 @@ class GroupAffiliate(GWSModel):
             "forward": self.forward,
             "sender": [s.json_data() for s in self.senders],
         }
+
+
+class GroupMembershipUpdate(GWSModel):
+    uwnetid = models.CharField(max_length=128)
+    action = models.CharField(max_length=32)
+    timestamp = models.IntegerField()
+    # Epoch timestamp in milliseconds
+
+    def is_add_member(self):
+        return self.action == "add member"
+
+    def is_delete_member(self):
+        return self.action == "delete member"
+
+    def json_data(self):
+        return {
+            "uwnetid": self.uwnetid,
+            "action": self.action,
+            "timestamp": self.timestamp,
+            "is_add_member": self.is_add_member(),
+            "is_delete_member": self.is_delete_member(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        data = kwargs.get("data")
+        if data is None:
+            return super(GroupMembershipUpdate, self).__init__(*args, **kwargs)
+        self.action, name = data.get("description").split(": ")
+        self.uwnetid = name.replace("'", "")
+        self.timestamp = int(data.get("timestamp"))
