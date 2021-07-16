@@ -281,6 +281,6 @@ class GroupHistory(GWSModel):
         self.activity = data.get("activity")
         self.description = data.get("description")
         self.timestamp = int(data.get("timestamp"))
-        if data.get("activity") == "membership":
+        if self.activity == "membership":
             self.member_action, name = self.description.split(": ")
             self.member_uwnetid = name.replace("'", "")
