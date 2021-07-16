@@ -332,7 +332,10 @@ class GWSGroupTest(TestCase):
 
     def test_get_group_history(self):
         gh = GroupHistory(
-            member_uwnetid="five", member_action="add member",
+            description="add member: 'five'",
+            activity='membership',
+            member_uwnetid="five",
+            member_action="add member",
             timestamp=162621504964)
         self.assertTrue(gh.is_add_member())
 

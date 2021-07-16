@@ -209,7 +209,7 @@ class GWS(object):
         :param order: the sort order,one of {}
         :param activity: one of {"acl", "assignGroupType", "attribute",
             "membership", "group"}
-        id: member ID selector
+        :param id: member ID selector
         """
         kwargs = {}
         if activity:
