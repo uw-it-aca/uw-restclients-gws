@@ -1,0 +1,43 @@
+{
+    "schemas": [
+        "urn:mace:washington.edu:schemas:groups:1.0"
+    ],
+    "meta": {
+        "resourceType": "history",
+        "version": "v3.0",
+        "lastModified": "1313239708377",
+        "selfRef": "https://groups.uw.edu/group_sws/v3/group/u_acadev_tester/history"
+    },
+    "data": [
+      {
+        "timestamp":1626215049643,
+        "actAs":"",
+        "activity":"membership",
+        "description":"add member: 'five'"
+      },
+      {
+        "timestamp":1626193233239,
+        "actAs":"",
+        "activity":"membership",
+        "description":"delete member: 'eight'"
+      },
+      {
+        "timestamp":1626119429509,
+        "actAs":"",
+        "activity":"acl",
+        "description":"set admin acl for: 'u_acadev_tester'"
+      },
+      { "timestamp":1626119425601,
+        "user":"eventcal.washington.edu",
+        "actAs":"",
+        "activity":"group",
+        "description":"description='Specifying who are testers'"
+      },
+      { "timestamp":1626119425407,
+        "user":"aca",
+        "actAs":"",
+        "activity":"group",
+        "description":"created: 'u_eventcal_sea_1340210-editor'"
+  }
+    ]
+}

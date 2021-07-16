@@ -15,7 +15,7 @@ from restclients_core.exceptions import DataFailureException
 from uw_gws.dao import GWS_DAO
 from uw_gws.models import (
     Group, CourseGroup, GroupReference, GroupEntity, GroupMember,
-    GroupAffiliate, GroupMembershipUpdate)
+    GroupAffiliate, GroupHistory)
 from uw_gws.exceptions import InvalidGroupID
 
 
@@ -198,20 +198,34 @@ class GWS(object):
             return errors[0].get("notFound", [])
         return []
 
-    def get_membership_history(self, group_id, start_time):
+    def get_group_history(self, group_id,
+                          activity=None,
+                          start=0,
+                          id=None):
         """
-        Returns a list of GroupMembershipUpdate objects, in the order of
+        Returns a list of GroupHistory objects, in the order of
         from the earliest to the latest.
-        start_time: Epoch timestamp in seconds
+        :param start: Epoch timestamp in seconds
+        :param order: the sort order,one of {}
+        :param activity: one of {"acl", "assignGroupType", "attribute",
+            "membership", "group"}
+        id: member ID selector
         """
+        kwargs = {}
+        if activity:
+            kwargs['activity'] = activity
+        if start:
+            kwargs['start'] = start * 1000
+        if id:
+            kwargs['id'] = id
+        url = "{}/group/{}/history".format(self.API, group_id)
         self._valid_group_id(group_id)
-        url = "{}/group/{}/history?start={}".format(
-            self.API, group_id, start_time * 1000)
+        if len(kwargs):
+            url = "{}?{}".format(url, urlencode(kwargs))
         data = self._get_resource(url)
         changes = []
         for datum in data.get("data"):
-            if datum.get("activity") == "membership":
-                changes.insert(0, GroupMembershipUpdate(data=datum))
+            changes.insert(0, GroupHistory(data=datum))
         return changes
 
     def get_effective_members(self, group_id):
