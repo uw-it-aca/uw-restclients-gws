@@ -249,23 +249,27 @@ class GroupAffiliate(GWSModel):
         }
 
 
-class GroupMembershipUpdate(GWSModel):
-    uwnetid = models.CharField(max_length=128)
-    action = models.CharField(max_length=32)
+class GroupHistory(GWSModel):
+    description = models.CharField(max_length=512)
+    activity = models.CharField(max_length=64)
+    member_uwnetid = models.CharField(max_length=128, null=True)
+    member_action = models.CharField(max_length=32, null=True)
     timestamp = models.IntegerField()
     # Epoch timestamp in milliseconds
 
     def is_add_member(self):
-        return self.action == "add member"
+        return self.member_action and self.member_action == "add member"
 
     def is_delete_member(self):
-        return self.action == "delete member"
+        return self.member_action and self.member_action == "delete member"
 
     def json_data(self):
         return {
-            "uwnetid": self.uwnetid,
-            "action": self.action,
+            "description": self.description,
+            "activity": self.activity,
             "timestamp": self.timestamp,
+            "member_uwnetid": self.member_uwnetid,
+            "member_action": self.member_action,
             "is_add_member": self.is_add_member(),
             "is_delete_member": self.is_delete_member(),
         }
@@ -273,7 +277,10 @@ class GroupMembershipUpdate(GWSModel):
     def __init__(self, *args, **kwargs):
         data = kwargs.get("data")
         if data is None:
-            return super(GroupMembershipUpdate, self).__init__(*args, **kwargs)
-        self.action, name = data.get("description").split(": ")
-        self.uwnetid = name.replace("'", "")
+            return super(GroupHistory, self).__init__(*args, **kwargs)
+        self.activity = data.get("activity")
+        self.description = data.get("description")
         self.timestamp = int(data.get("timestamp"))
+        if self.activity == "membership":
+            self.member_action, name = self.description.split(": ")
+            self.member_uwnetid = name.replace("'", "")

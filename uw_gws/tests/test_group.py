@@ -8,7 +8,7 @@ from restclients_core.exceptions import DataFailureException
 from uw_gws import GWS
 from uw_gws.models import (
     Group, CourseGroup, GroupEntity, GroupMember, GroupAffiliate,
-    GroupMembershipUpdate)
+    GroupHistory)
 from uw_gws.utilities import fdao_gws_override
 from uw_gws.exceptions import InvalidGroupID
 from restclients_core.exceptions import DataFailureException
@@ -330,28 +330,65 @@ class GWSGroupTest(TestCase):
             GroupEntity(name="all", type=GroupEntity.SET_TYPE),
             group.optouts)
 
-    def test_get_membership_history(self):
+    def test_get_group_history(self):
+        gh = GroupHistory(
+            description="add member: 'five'",
+            activity='membership',
+            member_uwnetid="five",
+            member_action="add member",
+            timestamp=162621504964)
+        self.assertTrue(gh.is_add_member())
+
+        history = GWS().get_group_history('u_acadev_tester')
+        self.assertEqual(len(history), 5)
+        self.assertEqual(
+            history[0].json_data(),
+            {"description": "created: 'u_eventcal_sea_1340210-editor'",
+             "activity": "group",
+             "timestamp": 1626119425407,
+             "member_uwnetid": None,
+             "member_action": None,
+             "is_add_member": None,
+             "is_delete_member": None})
+
+        # get change history of a particular member id
+        changes = GWS().get_group_history(
+            'u_acadev_tester', id='eight')
+        self.assertEqual(len(changes), 1)
+        self.assertEquals(
+            changes[0].json_data(),
+            {"description": "delete member: 'eight'",
+             "activity": "membership",
+             "member_uwnetid": "eight",
+             "member_action": "delete member",
+             "timestamp": 1626193233239,
+             "is_add_member": False,
+             "is_delete_member": True})
+
+        # get history of membership changes since a given timestamp
         d = int(timezone("US/Pacific").localize(
             datetime(2021, 7, 13, 15, 30, 00)).timestamp())
-        changes = GWS().get_membership_history('u_acadev_tester', d)
+        changes = GWS().get_group_history(
+            'u_acadev_tester',
+            activity='membership',
+            start=d)
         self.assertEqual(len(changes), 2)
         self.assertEquals(
             changes[0].json_data(),
-            {"uwnetid": "eight",
-             "action": "delete member",
+            {"description": "delete member: 'eight'",
+             "activity": "membership",
+             "member_uwnetid": "eight",
+             "member_action": "delete member",
              "timestamp": 1626193233239,
              "is_add_member": False,
              "is_delete_member": True})
         self.assertEquals(
             changes[1].json_data(),
-            {"uwnetid": "five",
-             "action": "add member",
+            {"description": "add member: 'five'",
+             "activity": "membership",
              "timestamp": 1626215049643,
+             "member_uwnetid": "five",
+             "member_action": "add member",
              "is_add_member": True,
              "is_delete_member": False})
         self.assertIsNotNone(changes[1])
-
-        mup = GroupMembershipUpdate(
-            uwnetid="five", action="add member",
-            timestamp=162621504964)
-        self.assertTrue(mup.is_add_member())
