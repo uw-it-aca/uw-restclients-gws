@@ -206,7 +206,6 @@ class GWS(object):
         Returns a list of GroupHistory objects, in the order of
         from the earliest to the latest.
         :param start: Epoch timestamp in seconds
-        :param order: the sort order,one of {}
         :param activity: one of {"acl", "membership"}
         :param id: member ID selector
         """
