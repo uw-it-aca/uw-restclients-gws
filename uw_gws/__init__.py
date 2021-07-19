@@ -207,8 +207,7 @@ class GWS(object):
         from the earliest to the latest.
         :param start: Epoch timestamp in seconds
         :param order: the sort order,one of {}
-        :param activity: one of {"acl", "assignGroupType", "attribute",
-            "membership", "group"}
+        :param activity: one of {"acl", "membership"}
         :param id: member ID selector
         """
         kwargs = {}
