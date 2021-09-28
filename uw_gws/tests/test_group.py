@@ -249,8 +249,8 @@ class GWSGroupTest(TestCase):
     def test_is_effective_member(self):
         gws = GWS()
 
-        self.assertEquals(
-            gws.is_effective_member('u_acadev_unittest', 'javerage'), True)
+        self.assertTrue(
+            gws.is_effective_member('u_acadev_unittest', 'javerage'))
         self.assertEquals(
             gws.is_effective_member(
                 'u_acadev_unittest', 'javerage@washington.edu'), True)
@@ -258,6 +258,15 @@ class GWSGroupTest(TestCase):
             gws.is_effective_member('u_acadev_unittest', 'eight'), True)
         self.assertEquals(
             gws.is_effective_member('u_acadev_unittest', 'not_member'), False)
+
+    def test_is_direct_member(self):
+        gws = GWS()
+
+        self.assertTrue(gws.is_direct_member('u_acadev_tester', 'javerage'))
+        self.assertTrue(gws.is_direct_member(
+                'u_acadev_tester', 'javerage@washington.edu'))
+        self.assertFalse(
+            gws.is_direct_member('u_acadev_unittest', 'eight'))
 
     def test_group_search(self):
         gws = GWS()
