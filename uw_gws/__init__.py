@@ -261,14 +261,22 @@ class GWS(object):
         """
         Returns True if the netid is in the group, False otherwise.
         """
+        return self.is_member(group_id, netid, True)
+
+    def is_direct_member(self, group_id, netid):
+        """
+        Returns True if the netid is in the group, False otherwise.
+        """
+        return self.is_member(group_id, netid, False)
+
+    def is_member(self, group_id, netid, is_effective):
         self._valid_group_id(group_id)
 
         # GWS doesn't accept EPPNs on effective member checks, for UW users
         netid = re.sub('@washington.edu', '', netid)
-
-        url = "{}/group/{}/effective_member/{}".format(self.API,
-                                                       group_id,
-                                                       netid)
+        url = "{}/group/{}/{}/{}".format(
+            self.API, group_id,
+            "effective_member" if is_effective else "member", netid)
 
         # Not using _get_resource() here because it automatically logs 404s
         response = self.DAO.getURL(url, self._headers())
