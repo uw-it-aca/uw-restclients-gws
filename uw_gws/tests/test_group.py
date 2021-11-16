@@ -26,10 +26,12 @@ class GWSGroupTest(TestCase):
 
     def test_request_headers(self):
         gws = GWS()
-        self.assertEquals(gws._headers(), {'Accept': 'application/json'})
+        self.assertEquals(gws._headers(), {'Accept': 'application/json',
+                                           'Connection': 'keep-alive'})
 
         gws = GWS(act_as='javerage')
         self.assertEquals(gws._headers(), {'Accept': 'application/json',
+                                           'Connection': 'keep-alive',
                                            'X-UW-Act-as': 'javerage'})
 
     def test_get_nonexistent_group(self):
