@@ -395,7 +395,7 @@ class GWS(object):
         return json.loads(response.data)
 
     def _headers(self):
-        headers = {"Accept": "application/json"}
+        headers = {"Accept": "application/json", "Connection": "keep-alive"}
 
         if self.act_as:
             headers["X-UW-Act-as"] = self.act_as
