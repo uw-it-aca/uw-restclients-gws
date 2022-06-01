@@ -1,5 +1,7 @@
 from commonconf.backends import use_configparser_backend, use_django_backend
 from commonconf import settings
+from uw_gws import GWS
+from uw_gws.models import GroupEntity
 import argparse
 import os
 
@@ -12,15 +14,17 @@ def add_members(group_id, file_path, act_as=None):
                                 'settings.cfg')
         use_configparser_backend(settings, 'GWS')
 
-    from uw_gws import GWS
-
     members = []
     with open(file_path, 'r') as f:
         for line in f:
-            members.append(line.strip())
+            members.append(GroupEntity(name=line.strip(),
+                                       type=GroupEntity.UWNETID_TYPE))
 
     client = GWS(act_as=act_as, log_errors=True)
-    client.add_members(group_id, members)
+    errors = client.update_members(group_id, members)
+
+    if len(errors):
+        print(errors)
 
 
 if __name__ == '__main__':
