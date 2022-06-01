@@ -6,7 +6,7 @@ import argparse
 import os
 
 
-def add_members(group_id, file_path, act_as=None):
+def update_members(group_id, file_path, act_as=None):
     try:
         use_django_backend()
     except ImportError:
@@ -29,8 +29,8 @@ def add_members(group_id, file_path, act_as=None):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('group_id', help='Add members for group [group_id]')
+    parser.add_argument('group_id', help='Update members for group [group_id]')
     parser.add_argument('path', help='Path to file containing members, one per line')
-    parser.add_argument('--act_as', default=None, help='User to act as when adding members')
+    parser.add_argument('--act_as', default=None, help='User to act as when updating members')
     args = parser.parse_args()
-    add_members(args.group_id, args.path, args.act_as)
+    update_members(args.group_id, args.path, args.act_as)
