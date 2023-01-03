@@ -1,4 +1,4 @@
-# Copyright 2022 UW-IT, University of Washington
+# Copyright 2023 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
 
@@ -58,11 +58,11 @@ class GWS(object):
         kwargs = dict((k.lower(), kwargs[k].lower()) for k in kwargs)
         if 'type' in kwargs and (
                 kwargs['type'] != 'direct' and kwargs['type'] != 'effective'):
-            del(kwargs['type'])
+            del (kwargs['type'])
 
         if 'scope' in kwargs and (
                 kwargs['scope'] != 'one' and kwargs['scope'] != 'all'):
-            del(kwargs['scope'])
+            del (kwargs['scope'])
 
         if "instructor" in kwargs or "student" in kwargs:
             kwargs["stem"] = "course"
