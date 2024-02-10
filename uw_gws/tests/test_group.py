@@ -3,7 +3,7 @@
 
 
 from datetime import datetime
-from pytz import timezone
+import pytz
 from unittest import TestCase
 from restclients_core.exceptions import DataFailureException
 from uw_gws import GWS
@@ -378,7 +378,7 @@ class GWSGroupTest(TestCase):
              "is_delete_member": True})
 
         # get history of membership changes since a given timestamp
-        d = int(timezone("US/Pacific").localize(
+        d = int(pytz.timezone('America/Los_Angeles').localize(
             datetime(2021, 7, 13, 15, 30, 00)).timestamp())
         changes = GWS().get_group_history(
             'u_acadev_tester',
