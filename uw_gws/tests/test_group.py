@@ -1,9 +1,6 @@
 # Copyright 2024 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
-
-from datetime import datetime
-import pytz
 from unittest import TestCase
 from restclients_core.exceptions import DataFailureException
 from uw_gws import GWS
@@ -12,7 +9,7 @@ from uw_gws.models import (
     GroupHistory)
 from uw_gws.utilities import fdao_gws_override
 from uw_gws.exceptions import InvalidGroupID
-from restclients_core.exceptions import DataFailureException
+from datetime import datetime, timedelta, timezone
 import mock
 
 
@@ -27,6 +24,7 @@ class GWSGroupTest(TestCase):
 
     def test_request_headers(self):
         gws = GWS()
+
         self.assertEqual(gws._headers(),
                          {'Accept': 'application/json',
                           'Connection': 'keep-alive'})
@@ -137,6 +135,7 @@ class GWSGroupTest(TestCase):
                               name="javerage",
                               mtype="direct")
         self.assertEqual(member1.is_uwnetid(), True)
+
         self.assertEqual(
             member1.json_data(),
             {"type": "uwnetid",
@@ -147,6 +146,7 @@ class GWSGroupTest(TestCase):
             member1.json_data(is_put_req=True),
             {"type": "uwnetid",
              "id": "javerage"})
+
         member2 = GroupMember(type="uwnetid", name="javerage")
         self.assertEqual(member2.type, "uwnetid")
         self.assertEqual(member2.name, "javerage")
@@ -382,12 +382,12 @@ class GWSGroupTest(TestCase):
              "is_delete_member": True})
 
         # get history of membership changes since a given timestamp
-        d = int(pytz.timezone('America/Los_Angeles').localize(
-            datetime(2021, 7, 13, 15, 30, 00)).timestamp())
+        ts = datetime(2021, 7, 13, 15, 30, 00, tzinfo=timezone(
+            timedelta(seconds=-7*60*60))).timestamp()
         changes = GWS().get_group_history(
             'u_acadev_tester',
             activity='membership',
-            start=d)
+            start=int(ts))
         self.assertEqual(len(changes), 2)
         self.assertEqual(
             changes[0].json_data(),

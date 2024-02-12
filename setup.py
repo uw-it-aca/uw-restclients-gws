@@ -24,8 +24,7 @@ setup(
     author="UW-IT T&LS",
     author_email="aca-it@uw.edu",
     include_package_data=True,
-    install_requires=['UW-RestClients-Core',
-                      'pytz'],
+    install_requires=['UW-RestClients-Core'],
     license='Apache License, Version 2.0',
     description=('A library for connecting to the Groups Web Service at the '
                  'University of Washington'),
