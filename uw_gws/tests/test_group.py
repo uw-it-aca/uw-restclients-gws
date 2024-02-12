@@ -24,13 +24,16 @@ class GWSGroupTest(TestCase):
 
     def test_request_headers(self):
         gws = GWS()
-        self.assertEqual(gws._headers(), {'Accept': 'application/json',
-                                           'Connection': 'keep-alive'})
+
+        self.assertEqual(gws._headers(),
+                         {'Accept': 'application/json',
+                          'Connection': 'keep-alive'})
 
         gws = GWS(act_as='javerage')
-        self.assertEqual(gws._headers(), {'Accept': 'application/json',
-                                           'Connection': 'keep-alive',
-                                           'X-UW-Act-as': 'javerage'})
+        self.assertEqual(gws._headers(),
+                         {'Accept': 'application/json',
+                          'Connection': 'keep-alive',
+                          'X-UW-Act-as': 'javerage'})
 
     def test_get_nonexistent_group(self):
         gws = GWS()
@@ -132,14 +135,18 @@ class GWSGroupTest(TestCase):
                               name="javerage",
                               mtype="direct")
         self.assertEqual(member1.is_uwnetid(), True)
-        self.assertEqual(member1.json_data(),
-                          {"type": "uwnetid",
-                           "mtype": "direct",
-                           "source": None,
-                           "id": "javerage"})
-        self.assertEqual(member1.json_data(is_put_req=True),
-                          {"type": "uwnetid",
-                           "id": "javerage"})
+
+        self.assertEqual(
+            member1.json_data(),
+            {"type": "uwnetid",
+             "mtype": "direct",
+             "source": None,
+             "id": "javerage"})
+        self.assertEqual(
+            member1.json_data(is_put_req=True),
+            {"type": "uwnetid",
+             "id": "javerage"})
+
         member2 = GroupMember(type="uwnetid", name="javerage")
         self.assertEqual(member2.type, "uwnetid")
         self.assertEqual(member2.name, "javerage")
