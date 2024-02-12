@@ -1,4 +1,4 @@
-# Copyright 2023 UW-IT, University of Washington
+# Copyright 2024 UW-IT, University of Washington
 # SPDX-License-Identifier: Apache-2.0
 
 import os
@@ -21,11 +21,10 @@ setup(
     name='UW-RestClients-GWS',
     version=VERSION,
     packages=['uw_gws'],
-    author="UW-IT AXDD",
+    author="UW-IT T&LS",
     author_email="aca-it@uw.edu",
     include_package_data=True,
-    install_requires=['UW-RestClients-Core',
-                      'pytz'],
+    install_requires=['UW-RestClients-Core'],
     license='Apache License, Version 2.0',
     description=('A library for connecting to the Groups Web Service at the '
                  'University of Washington'),
@@ -36,6 +35,5 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.8',
     ],
 )
