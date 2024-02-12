@@ -69,8 +69,8 @@ jobs:
 
       - name: Run Tests
         run: |
-          python -Wd -m compileall ${APP_NAME}/
-          coverage run ${APP_NAME}/test.py -v
+          python -m compileall ${APP_NAME}/
+          python -Wd -m coverage run ${APP_NAME}/test.py -v
 
       - name: Report Test Coverage
         if: matrix.python-version == env.COVERAGE_PYTHON_VERSION
