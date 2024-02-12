@@ -27,11 +27,11 @@ class GWSGroupTest(TestCase):
 
     def test_request_headers(self):
         gws = GWS()
-        self.assertEquals(gws._headers(), {'Accept': 'application/json',
+        self.assertEqual(gws._headers(), {'Accept': 'application/json',
                                            'Connection': 'keep-alive'})
 
         gws = GWS(act_as='javerage')
-        self.assertEquals(gws._headers(), {'Accept': 'application/json',
+        self.assertEqual(gws._headers(), {'Accept': 'application/json',
                                            'Connection': 'keep-alive',
                                            'X-UW-Act-as': 'javerage'})
 
@@ -48,27 +48,27 @@ class GWSGroupTest(TestCase):
     def test_get_group(self):
         gws = GWS()
         group = gws.get_group_by_id('u_acadev_tester')
-        self.assertEquals(group.name, "u_acadev_tester")
-        self.assertEquals(group.uwregid, "2a815628b04c4ada8fa490ea8f4364c8")
-        self.assertEquals(group.display_name, "Friends and Partners of ACA")
-        self.assertEquals(
+        self.assertEqual(group.name, "u_acadev_tester")
+        self.assertEqual(group.uwregid, "2a815628b04c4ada8fa490ea8f4364c8")
+        self.assertEqual(group.display_name, "Friends and Partners of ACA")
+        self.assertEqual(
             group.description,
             "Folks outside of uw-it that need access to ACA resources")
-        self.assertEquals(group.contact, "javerage")
-        self.assertEquals(group.authnfactor, 1)
-        self.assertEquals(group.classification, "u")
-        self.assertEquals(group.dependson, "")
+        self.assertEqual(group.contact, "javerage")
+        self.assertEqual(group.authnfactor, 1)
+        self.assertEqual(group.classification, "u")
+        self.assertEqual(group.dependson, "")
 
     def test_get_course_group(self):
         gws = GWS()
         group = gws.get_group_by_id("course_2012aut-train102a")
-        self.assertEquals(group.name, "course_2012aut-train102a")
-        self.assertEquals(group.curriculum_abbr, "train")
-        self.assertEquals(group.course_number, 102)
-        self.assertEquals(group.section_id, "a")
-        self.assertEquals(group.year, 2012)
-        self.assertEquals(group.quarter, "autumn")
-        self.assertEquals(len(group.instructors), 11)
+        self.assertEqual(group.name, "course_2012aut-train102a")
+        self.assertEqual(group.curriculum_abbr, "train")
+        self.assertEqual(group.course_number, 102)
+        self.assertEqual(group.section_id, "a")
+        self.assertEqual(group.year, 2012)
+        self.assertEqual(group.quarter, "autumn")
+        self.assertEqual(len(group.instructors), 11)
         self.assertIsNotNone(group.json_data())
 
     def test_create_group(self):
@@ -85,7 +85,7 @@ class GWSGroupTest(TestCase):
         self.assertTrue('classification' in json_data)
         self.assertTrue('name' in json_data['admins'][0])
         group1 = gws._group_from_json(json_data)
-        self.assertEquals(group1.name, group.name)
+        self.assertEqual(group1.name, group.name)
 
         json_for_creat = group.json_data(is_put_req=True)
         self.assertFalse('regid' in json_for_creat)
@@ -94,12 +94,12 @@ class GWSGroupTest(TestCase):
         self.assertFalse('lastMemberModified' in json_for_creat)
         self.assertFalse('contact' in json_for_creat)
         self.assertFalse('classification' in json_for_creat)
-        self.assertEquals(len(json_for_creat['admins']), 1)
-        self.assertEquals(len(json_for_creat['readers']), 1)
-        self.assertEquals(len(json_for_creat['optins']), 0)
-        self.assertEquals(len(json_for_creat['optouts']), 0)
-        self.assertEquals(len(json_for_creat['creators']), 0)
-        self.assertEquals(len(json_for_creat['updaters']), 0)
+        self.assertEqual(len(json_for_creat['admins']), 1)
+        self.assertEqual(len(json_for_creat['readers']), 1)
+        self.assertEqual(len(json_for_creat['optins']), 0)
+        self.assertEqual(len(json_for_creat['optouts']), 0)
+        self.assertEqual(len(json_for_creat['creators']), 0)
+        self.assertEqual(len(json_for_creat['updaters']), 0)
 
         self.assertRaises(DataFailureException, gws.create_group, group)
 
@@ -134,35 +134,35 @@ class GWSGroupTest(TestCase):
         member1 = GroupMember(type="uwnetid",
                               name="javerage",
                               mtype="direct")
-        self.assertEquals(member1.is_uwnetid(), True)
-        self.assertEquals(member1.json_data(),
+        self.assertEqual(member1.is_uwnetid(), True)
+        self.assertEqual(member1.json_data(),
                           {"type": "uwnetid",
                            "mtype": "direct",
                            "source": None,
                            "id": "javerage"})
-        self.assertEquals(member1.json_data(is_put_req=True),
+        self.assertEqual(member1.json_data(is_put_req=True),
                           {"type": "uwnetid",
                            "id": "javerage"})
         member2 = GroupMember(type="uwnetid", name="javerage")
-        self.assertEquals(member2.type, "uwnetid")
-        self.assertEquals(member2.name, "javerage")
-        self.assertEquals(member2.mtype, GroupMember.DIRECT_MTYPE)
-        self.assertEquals(member1 == member2, True)
+        self.assertEqual(member2.type, "uwnetid")
+        self.assertEqual(member2.name, "javerage")
+        self.assertEqual(member2.mtype, GroupMember.DIRECT_MTYPE)
+        self.assertEqual(member1 == member2, True)
 
         member3 = GroupMember(type="eppn", name="javerage@washington.edu")
-        self.assertEquals(member3.is_uwnetid(), False)
-        self.assertEquals(member3.is_eppn(), True)
-        self.assertEquals(member1 == member3, False)
+        self.assertEqual(member3.is_uwnetid(), False)
+        self.assertEqual(member3.is_eppn(), True)
+        self.assertEqual(member1 == member3, False)
 
         member4 = GroupMember(type="group", name="u_acadev_unittest")
-        self.assertEquals(member4.is_uwnetid(), False)
-        self.assertEquals(member4.is_group(), True)
-        self.assertEquals(member1 == member4, False)
+        self.assertEqual(member4.is_uwnetid(), False)
+        self.assertEqual(member4.is_group(), True)
+        self.assertEqual(member1 == member4, False)
 
     def test_group_membership(self):
         gws = GWS()
         members = gws.get_members('u_acadev_unittest')
-        self.assertEquals(len(members), 2)
+        self.assertEqual(len(members), 2)
         self.assertIn(GroupMember(type="uwnetid", name="eight"), members)
         self.assertNotIn(GroupMember(type="eppn", name="j@washington.edu"),
                          members)
@@ -190,7 +190,7 @@ class GWSGroupTest(TestCase):
         gws = GWS()
         members = gws.get_members('u_acadev_unittest')
 
-        self.assertEquals(len(members), 2)
+        self.assertEqual(len(members), 2)
 
         members.remove(GroupMember(type="uwnetid", name="eight"))
 
@@ -223,13 +223,13 @@ class GWSGroupTest(TestCase):
 
         bad_members = gws.update_members("u_acadev_bad_members", members)
 
-        self.assertEquals(len(bad_members), 1)
+        self.assertEqual(len(bad_members), 1)
 
     def test_effective_group_membership(self):
         gws = GWS()
         members = gws.get_effective_members('u_acadev_unittest')
 
-        self.assertEquals(len(members), 3)
+        self.assertEqual(len(members), 3)
         has_seven = False
         has_javerage = False
         has_eight = False
@@ -242,24 +242,24 @@ class GWSGroupTest(TestCase):
             elif member.name == "eight":
                 has_eight = True
 
-        self.assertEquals(has_seven, True)
-        self.assertEquals(has_javerage, True)
-        self.assertEquals(has_eight, True)
+        self.assertEqual(has_seven, True)
+        self.assertEqual(has_javerage, True)
+        self.assertEqual(has_eight, True)
 
         count = gws.get_effective_member_count('u_acadev_unittest')
-        self.assertEquals(count, 3)
+        self.assertEqual(count, 3)
 
     def test_is_effective_member(self):
         gws = GWS()
 
         self.assertTrue(
             gws.is_effective_member('u_acadev_unittest', 'javerage'))
-        self.assertEquals(
+        self.assertEqual(
             gws.is_effective_member(
                 'u_acadev_unittest', 'javerage@washington.edu'), True)
-        self.assertEquals(
+        self.assertEqual(
             gws.is_effective_member('u_acadev_unittest', 'eight'), True)
-        self.assertEquals(
+        self.assertEqual(
             gws.is_effective_member('u_acadev_unittest', 'not_member'), False)
 
     def test_is_direct_member(self):
@@ -274,16 +274,16 @@ class GWSGroupTest(TestCase):
     def test_group_search(self):
         gws = GWS()
         groups = gws.search_groups(member="javerage")
-        self.assertEquals(len(groups), 15)
+        self.assertEqual(len(groups), 15)
 
         groups = gws.search_groups(member="JAVERAGE")
-        self.assertEquals(len(groups), 15)
+        self.assertEqual(len(groups), 15)
 
         groups = gws.search_groups(member="javerage", type="effective")
-        self.assertEquals(len(groups), 7)
+        self.assertEqual(len(groups), 7)
 
         groups = gws.search_groups(stem='cal_sea')
-        self.assertEquals(len(groups), 5)
+        self.assertEqual(len(groups), 5)
         self.assertEqual(groups[0].json_data(),
                          {'displayName': 'cal_sea parent group',
                           'id': 'cal_sea',
@@ -293,51 +293,51 @@ class GWSGroupTest(TestCase):
 
     def test_affiliates(self):
         group = GWS().get_group_by_id('u_acadev_unittest')
-        self.assertEquals(len(group.affiliates), 0)
+        self.assertEqual(len(group.affiliates), 0)
 
         group = GWS().get_group_by_id('u_acadev_tester')
-        self.assertEquals(len(group.affiliates), 1)
+        self.assertEqual(len(group.affiliates), 1)
 
         affiliate = group.affiliates[0]
-        self.assertEquals(affiliate.name, 'google')
-        self.assertEquals(affiliate.is_active(), True)
-        self.assertEquals(len(affiliate.senders), 0)
+        self.assertEqual(affiliate.name, 'google')
+        self.assertEqual(affiliate.is_active(), True)
+        self.assertEqual(len(affiliate.senders), 0)
 
     def test_group_roles(self):
         group = GWS().get_group_by_id('u_acadev_tester')
 
         self.assertIsNotNone(group.admins)
-        self.assertEquals(len(group.admins), 2)
+        self.assertEqual(len(group.admins), 2)
         self.assertIn(
             GroupEntity(name="u_javerage_admin", type=GroupEntity.GROUP_TYPE),
             group.admins)
 
         self.assertIsNotNone(group.updaters)
-        self.assertEquals(len(group.updaters), 1)
+        self.assertEqual(len(group.updaters), 1)
         self.assertIn(
             GroupEntity(name="u_javerage_update", type=GroupEntity.GROUP_TYPE),
             group.updaters)
 
         self.assertIsNotNone(group.readers)
-        self.assertEquals(len(group.readers), 1)
+        self.assertEqual(len(group.readers), 1)
         self.assertIn(
             GroupEntity(name="all", type=GroupEntity.SET_TYPE),
             group.readers)
 
         self.assertIsNotNone(group.creators)
-        self.assertEquals(len(group.creators), 1)
+        self.assertEqual(len(group.creators), 1)
         self.assertIn(
             GroupEntity(name="jcreator", type=GroupEntity.UWNETID_TYPE),
             group.creators)
 
         self.assertIsNotNone(group.optins)
-        self.assertEquals(len(group.optins), 1)
+        self.assertEqual(len(group.optins), 1)
         self.assertIn(
             GroupEntity(name="joptin", type=GroupEntity.UWNETID_TYPE),
             group.optins)
 
         self.assertIsNotNone(group.optouts)
-        self.assertEquals(len(group.optouts), 1)
+        self.assertEqual(len(group.optouts), 1)
         self.assertIn(
             GroupEntity(name="all", type=GroupEntity.SET_TYPE),
             group.optouts)
@@ -367,7 +367,7 @@ class GWSGroupTest(TestCase):
         changes = GWS().get_group_history(
             'u_acadev_tester', id='eight')
         self.assertEqual(len(changes), 1)
-        self.assertEquals(
+        self.assertEqual(
             changes[0].json_data(),
             {"description": "delete member: 'eight'",
              "activity": "membership",
@@ -385,7 +385,7 @@ class GWSGroupTest(TestCase):
             activity='membership',
             start=d)
         self.assertEqual(len(changes), 2)
-        self.assertEquals(
+        self.assertEqual(
             changes[0].json_data(),
             {"description": "delete member: 'eight'",
              "activity": "membership",
@@ -394,7 +394,7 @@ class GWSGroupTest(TestCase):
              "timestamp": 1626193233239,
              "is_add_member": False,
              "is_delete_member": True})
-        self.assertEquals(
+        self.assertEqual(
             changes[1].json_data(),
             {"description": "add member: 'five'",
              "activity": "membership",

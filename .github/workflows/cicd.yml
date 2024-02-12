@@ -69,7 +69,7 @@ jobs:
 
       - name: Run Tests
         run: |
-          python -m compileall ${APP_NAME}/
+          python -Wd -m compileall ${APP_NAME}/
           coverage run ${APP_NAME}/test.py -v
 
       - name: Report Test Coverage
