@@ -24,7 +24,7 @@ name: tests
 
 env:
   APP_NAME: uw_gws
-  COVERAGE_PYTHON_VERSION: '3.10'
+  COVERAGE_PYTHON_VERSION: '3.12'
 
 on:
   push:
@@ -46,6 +46,7 @@ jobs:
           - '3.8'
           - '3.9'
           - '3.10'
+          - '3.12'
 
     steps:
       - name: Checkout Repo
@@ -93,7 +94,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Publish to PyPi
         uses: uw-it-aca/actions/publish-pypi@main
