@@ -3,7 +3,7 @@
 [![Build Status](https://github.com/uw-it-aca/uw-restclients-gws/workflows/tests/badge.svg?branch=master)](https://github.com/uw-it-aca/uw-restclients-gws/actions)
 [![Coverage Status](https://coveralls.io/repos/github/uw-it-aca/uw-restclients-gws/badge.svg?branch=master)](https://coveralls.io/github/uw-it-aca/uw-restclients-gws?branch=master)
 [![PyPi Version](https://img.shields.io/pypi/v/uw-restclients-gws.svg)](https://pypi.python.org/pypi/uw-restclients-gws)
-![Python versions](https://img.shields.io/pypi/pyversions/uw-restclients-gws.svg)
+![Python versions](https://img.shields.io/badge/python-3.12-blue.svg)
 
 Installation:
 
